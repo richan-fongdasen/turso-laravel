@@ -1,12 +1,14 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+declare(strict_types=1);
+
+namespace RichanFongdasen\LaravelTurso\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class LaravelTursoCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-turso';
 
     public $description = 'My command';
 

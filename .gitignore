@@ -1,5 +1,6 @@
 .idea
 .phpunit.cache
+.phpunit.result.cache
 build
 composer.lock
 coverage
@@ -9,3 +10,4 @@ phpstan.neon
 testbench.yaml
 vendor
 node_modules
+*.swp
