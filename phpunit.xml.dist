@@ -16,7 +16,7 @@
     backupStaticProperties="false"
 >
     <testsuites>
-        <testsuite name="Laravel Turso Test Suite">
+        <testsuite name="Turso Laravel Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

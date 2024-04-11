@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
   - name: Ask a question
-    url: https://github.com/Richan Fongdasen/laravel-turso/discussions/new?category=q-a
+    url: https://github.com/richan-fongdasen/turso-laravel/discussions/new?category=q-a
     about: Ask the community for help
   - name: Request a feature
-    url: https://github.com/Richan Fongdasen/laravel-turso/discussions/new?category=ideas
+    url: https://github.com/richan-fongdasen/turso-laravel/discussions/new?category=ideas
     about: Share ideas for new features
   - name: Report a security issue
-    url: https://github.com/Richan Fongdasen/laravel-turso/security/policy
+    url: https://github.com/richan-fongdasen/turso-laravel/security/policy
     about: Learn how to notify us for sensitive bugs

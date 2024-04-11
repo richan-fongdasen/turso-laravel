@@ -1,3 +1,3 @@
 # Changelog
 
-All notable changes to `laravel-turso` will be documented in this file.
+All notable changes to `richan-fongdasen/turso-laravel` will be documented in this file.

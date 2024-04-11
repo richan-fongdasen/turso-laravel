@@ -1,12 +1,14 @@
 {
-    "name": "richan-fongdasen/laravel-turso",
-    "description": "This is my package laravel-turso",
+    "name": "richan-fongdasen/turso-laravel",
+    "description": "A Turso/LibSQL database driver for Laravel",
+    "type": "library",
     "keywords": [
         "Richan Fongdasen",
+        "turso",
         "laravel",
-        "laravel-turso"
+        "turso-laravel"
     ],
-    "homepage": "https://github.com/richan-fongdasen/laravel-turso",
+    "homepage": "https://github.com/richan-fongdasen/turso-laravel",
     "license": "MIT",
     "authors": [
         {
@@ -17,8 +19,13 @@
     ],
     "require": {
         "php": "^8.2",
-        "spatie/laravel-package-tools": "^1.16",
-        "illuminate/contracts": "^11.0"
+        "illuminate/contracts": "^11.0",
+        "illuminate/console": "^11.0",
+        "illuminate/database": "^11.0",
+        "illuminate/filesystem": "^11.0",
+        "illuminate/http": "^11.0",
+        "illuminate/support": "^11.0",
+        "spatie/laravel-package-tools": "^1.16"
     },
     "require-dev": {
         "larastan/larastan": "^2.9",
@@ -35,19 +42,18 @@
     },
     "autoload": {
         "psr-4": {
-            "RichanFongdasen\\LaravelTurso\\": "src/",
-            "RichanFongdasen\\LaravelTurso\\Database\\Factories\\": "database/factories/"
+            "RichanFongdasen\\Turso\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "RichanFongdasen\\LaravelTurso\\Tests\\": "tests/",
+            "RichanFongdasen\\Turso\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
     "scripts": {
         "post-autoload-dump": "@composer run prepare",
-        "clear": "@php vendor/bin/testbench package:purge-laravel-turso --ansi",
+        "clear": "@php vendor/bin/testbench package:purge-turso-laravel --ansi",
         "prepare": "@php vendor/bin/testbench package:discover --ansi",
         "build": [
             "@composer run prepare",
@@ -73,10 +79,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "RichanFongdasen\\LaravelTurso\\LaravelTursoServiceProvider"
+                "RichanFongdasen\\Turso\\TursoLaravelServiceProvider"
             ],
             "aliases": {
-                "LaravelTurso": "RichanFongdasen\\LaravelTurso\\Facades\\LaravelTurso"
+                "Turso": "RichanFongdasen\\Turso\\Facades\\Turso"
             }
         }
     },

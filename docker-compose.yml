@@ -1,0 +1,11 @@
+version: "3.6"
+
+services:
+  turso:
+    container_name: turso
+    restart: unless-stopped
+    image: "richan/turso-dev:latest"
+    environment:
+      - TURSO_DB_FILE=/var/lib/turso/turso.sqlite
+    ports:
+      - "8080:8080"

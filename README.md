@@ -1,65 +1,80 @@
-# This is my package laravel-turso
+# A Turso database driver for Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/richan-fongdasen/laravel-turso.svg?style=flat-square)](https://packagist.org/packages/richan-fongdasen/laravel-turso)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/richan-fongdasen/laravel-turso/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/richan-fongdasen/laravel-turso/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/richan-fongdasen/laravel-turso/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/richan-fongdasen/laravel-turso/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/richan-fongdasen/laravel-turso.svg?style=flat-square)](https://packagist.org/packages/richan-fongdasen/laravel-turso)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/richan-fongdasen/turso-laravel.svg?style=flat-square)](https://packagist.org/packages/richan-fongdasen/turso-laravel)
+[![License: MIT](https://poser.pugx.org/richan-fongdasen/turso-laravel/license.svg)](https://opensource.org/licenses/MIT)
+[![Unit Tests](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/run-tests.yml)
+[![Code Style](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/fix-php-code-style-issues.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/fix-php-code-style-issues.yml)
+[![codecov](https://codecov.io/gh/richan-fongdasen/turso-laravel/graph/badge.svg?token=eKJSttyUGc)](https://codecov.io/gh/richan-fongdasen/turso-laravel)
+[![Total Downloads](https://img.shields.io/packagist/dt/richan-fongdasen/turso-laravel.svg?style=flat-square)](https://packagist.org/packages/richan-fongdasen/turso-laravel)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+This package provides a Turso database driver for Laravel. It allows you to use Turso database as your database driver in Laravel application. The database driver is implemented using HTTP client to communicate with the Turso database server.
 
-## Support us
+## Unsupported Features
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-turso.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-turso)
+There are some features that are not supported by this package yet. Here are the list of unsupported features:
 
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
+-   Creating and dropping database
+-   [Database Transactions](https://turso.tech/blog/bring-your-own-sdk-with-tursos-http-api-ff4ccbed)
+-   [Turso Batch Request](https://github.com/tursodatabase/libsql/blob/main/docs/HTTP_V2_SPEC.md#execute-a-batch)
+-   [Turso Sequence Request](https://github.com/tursodatabase/libsql/blob/main/docs/HTTP_V2_SPEC.md#execute-a-sequence-of-sql-statements)
+-   [Turso Describe Request](https://github.com/tursodatabase/libsql/blob/main/docs/HTTP_V2_SPEC.md#describe-a-statement)
+-   [Turso Store SQL Request](https://github.com/tursodatabase/libsql/blob/main/docs/HTTP_V2_SPEC.md#store-an-sql-text-on-the-server)
+-   [Turso Close Stored SQL Request](https://github.com/tursodatabase/libsql/blob/main/docs/HTTP_V2_SPEC.md#close-a-stored-sql-text)
 
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+## Requirements
+
+-   PHP 8.2 or higher
+-   Laravel 11.0 or higher
 
 ## Installation
 
 You can install the package via composer:
 
 ```bash
-composer require richan-fongdasen/laravel-turso
+composer require richan-fongdasen/turso-laravel
 ```
 
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="laravel-turso-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="laravel-turso-config"
-```
-
-This is the contents of the published config file:
+To use Turso as your database driver in Laravel, you need to append the following configuration to the `connections` array in your `config/database.php` file:
 
 ```php
-return [
-];
+'turso' => [
+    'driver'                  => 'turso',
+    'turso_url'               => env('DB_URL', 'http://localhost:8080'),
+    'database'                => null,
+    'prefix'                  => env('DB_PREFIX', ''),
+    'access_token'            => env('DB_ACCESS_TOKEN', null),
+    'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+],
 ```
 
-Optionally, you can publish the views using
+## Configuration
+
+In Laravel application, The database driver configuration is stored in your `.env` file. Here is the list of available configuration for Turso database driver:
 
 ```bash
-php artisan vendor:publish --tag="laravel-turso-views"
+DB_CONNECTION=turso
+DB_URL=http://localhost:8080
+DB_PREFIX=
+DB_ACCESS_TOKEN=
 ```
 
 ## Usage
 
+For local development, you can use the local Turso database server that is provided by the Turso database team for development purposes. You can find the instruction to run the local Turso database server in the [Turso CLI documentation](https://docs.turso.tech/local-development#turso-cli).
+
+The Turso database driver should work as expected with Laravel Query Builder and Eloquent ORM.
+
+## Debugging
+
+There is a way to debug the HTTP request and response that is sent and received by the Turso database client. Here is the example of how to enable the debugging feature:
+
 ```php
-$laravelTurso = new RichanFongdasen\LaravelTurso();
-echo $laravelTurso->echoPhrase('Hello, RichanFongdasen!');
-```
+Turso::enableQueryLog();
 
-## Testing
+DB::table('users')->get();
 
-```bash
-composer test
+// Get the query log
+$logs = Turso::getQueryLog();
 ```
 
 ## Changelog
@@ -68,7 +83,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 ## Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
 
 ## Security Vulnerabilities
 
@@ -76,8 +91,8 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [Richan Fongdasen](https://github.com/richan-fongdasen)
-- [All Contributors](../../contributors)
+-   [Richan Fongdasen](https://github.com/richan-fongdasen)
+-   [All Contributors](../../contributors)
 
 ## License
 

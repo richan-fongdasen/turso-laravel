@@ -11,3 +11,6 @@ testbench.yaml
 vendor
 node_modules
 *.swp
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
