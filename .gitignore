@@ -9,8 +9,10 @@ phpunit.xml
 phpstan.neon
 testbench.yaml
 vendor
+package-lock.json
 node_modules
 *.swp
 *.sqlite
 *.sqlite-shm
 *.sqlite-wal
+*.sqlite-client_wal_index

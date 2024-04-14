@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace RichanFongdasen\Turso\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use RichanFongdasen\Turso\TursoClient;
+use RichanFongdasen\Turso\TursoManager;
 
 /**
- * @see \RichanFongdasen\Turso\TursoClient
+ * @see \RichanFongdasen\Turso\TursoHttpClient
  *
- * @mixin \RichanFongdasen\Turso\TursoClient
+ * @mixin \RichanFongdasen\Turso\TursoHttpClient
  */
 class Turso extends Facade
 {
     protected static function getFacadeAccessor(): string
     {
-        return TursoClient::class;
+        return TursoManager::class;
     }
 }

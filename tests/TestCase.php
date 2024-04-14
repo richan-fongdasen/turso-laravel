@@ -28,7 +28,8 @@ class TestCase extends Orchestra
     {
         config()->set('database.connections.turso', [
             'driver'                  => 'turso',
-            'turso_url'               => env('DB_URL', 'http://127.0.0.1:8080'),
+            'db_url'                  => env('DB_URL', 'http://127.0.0.1:8080'),
+            'db_replica'              => env('DB_REPLICA'),
             'database'                => null,
             'prefix'                  => env('DB_PREFIX', ''),
             'access_token'            => 'your-access-token',

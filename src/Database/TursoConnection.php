@@ -9,6 +9,8 @@ use Illuminate\Filesystem\Filesystem;
 
 class TursoConnection extends SQLiteConnection
 {
+    protected bool $hasUpdated = false;
+
     public function __construct(TursoPDO $pdo, string $database = ':memory:', string $tablePrefix = '', array $config = [])
     {
         parent::__construct($pdo, $database, $tablePrefix, $config);
@@ -66,5 +68,55 @@ class TursoConnection extends SQLiteConnection
     protected function getDefaultPostProcessor(): TursoQueryProcessor
     {
         return new TursoQueryProcessor();
+    }
+
+    /**
+     * Run an insert statement against the database.
+     *
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return bool
+     */
+    public function insert($query, $bindings = [])
+    {
+        $this->hasUpdated = true;
+
+        return parent::insert($query, $bindings);
+    }
+
+    /**
+     * Run an update statement against the database.
+     *
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return int
+     */
+    public function update($query, $bindings = [])
+    {
+        $this->hasUpdated = true;
+
+        return parent::update($query, $bindings);
+    }
+
+    /**
+     * Run a delete statement against the database.
+     *
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return int
+     */
+    public function delete($query, $bindings = [])
+    {
+        $this->hasUpdated = true;
+
+        return parent::delete($query, $bindings);
+    }
+
+    public function hasUpdated(): bool
+    {
+        return $this->hasUpdated;
     }
 }

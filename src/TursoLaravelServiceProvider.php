@@ -6,6 +6,8 @@ namespace RichanFongdasen\Turso;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
+use PDO;
+use RichanFongdasen\Turso\Commands\TursoSyncCommand;
 use RichanFongdasen\Turso\Database\TursoConnection;
 use RichanFongdasen\Turso\Database\TursoConnector;
 use Spatie\LaravelPackageTools\Package;
@@ -22,15 +24,20 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('turso-laravel')
-            ->hasConfigFile();
+            ->hasConfigFile()
+            ->hasCommand(TursoSyncCommand::class);
+
+        $this->publishes([
+            realpath(dirname(__DIR__) . '/turso-sync.mjs') => base_path('turso-sync.mjs'),
+        ], 'sync-script');
     }
 
     public function register(): void
     {
         parent::register();
 
-        $this->app->scoped(TursoClient::class, function () {
-            return new TursoClient();
+        $this->app->scoped(TursoManager::class, function () {
+            return new TursoManager(config('database.connections.turso'));
         });
 
         $this->app->extend(DatabaseManager::class, function (DatabaseManager $manager) {
@@ -38,7 +45,15 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
                 $connector = new TursoConnector();
                 $pdo = $connector->connect($config);
 
-                return new TursoConnection($pdo, $database ?? ':memory:', $prefix, $config);
+                $connection = new TursoConnection($pdo, $database ?? 'turso', $prefix, $config);
+
+                $replicaPath = (string) data_get($config, 'db_replica');
+
+                if ($replicaPath !== '') {
+                    $connection->setReadPdo(new PDO('sqlite:' . $replicaPath));
+                }
+
+                return $connection;
             });
 
             return $manager;

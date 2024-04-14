@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "sync": "node turso-sync.js"
+  },
+  "devDependencies": {
+    "@libsql/client": "^0.6.0"
+  }
+}

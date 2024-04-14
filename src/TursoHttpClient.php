@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use RichanFongdasen\Turso\Exceptions\TursoQueryException;
 
-class TursoClient
+class TursoHttpClient
 {
     protected string $baseUrl;
 
@@ -17,15 +17,17 @@ class TursoClient
 
     protected array $config = [];
 
+    protected bool $isOpen;
+
     protected bool $loggingQueries;
 
     protected Collection $queryLog;
 
     protected ?PendingRequest $request = null;
 
-    public function __construct()
+    public function __construct(array $config = [])
     {
-        $this->config = config('database.connections.turso', []);
+        $this->config = $config;
 
         $this->queryLog = new Collection();
 
@@ -35,7 +37,9 @@ class TursoClient
 
     public function __destruct()
     {
-        $this->close();
+        if ($this->isOpen) {
+            $this->close();
+        }
     }
 
     public function close(): void
@@ -93,6 +97,15 @@ class TursoClient
         $this->loggingQueries = true;
     }
 
+    public function freshRequest(): PendingRequest
+    {
+        $this->resetClientState();
+
+        $this->request = $this->createRequest();
+
+        return $this->request;
+    }
+
     public function getBaseUrl(): ?string
     {
         return $this->baseUrl;
@@ -117,6 +130,10 @@ class TursoClient
         if ($response->failed()) {
             $this->resetClientState();
             $response->throw();
+        }
+
+        if (! $this->isOpen) {
+            $this->isOpen = true;
         }
 
         $jsonResponse = $response->json();
@@ -152,16 +169,15 @@ class TursoClient
 
     public function request(): PendingRequest
     {
-        if ($this->request === null) {
-            $this->request = $this->createRequest();
-        }
-
-        return $this->request;
+        return ($this->request === null)
+            ? $this->freshRequest()
+            : $this->request;
     }
 
     public function resetClientState(): void
     {
         $this->baton = null;
-        $this->baseUrl = data_get($this->config, 'turso_url');
+        $this->baseUrl = data_get($this->config, 'db_url');
+        $this->isOpen = false;
     }
 }
