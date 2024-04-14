@@ -1,11 +1,12 @@
 # A Turso database driver for Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/richan-fongdasen/turso-laravel.svg?style=flat-square)](https://packagist.org/packages/richan-fongdasen/turso-laravel)
-[![License: MIT](https://poser.pugx.org/richan-fongdasen/turso-laravel/license.svg)](https://opensource.org/licenses/MIT)
-[![Unit Tests](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/run-tests.yml)
-[![Code Style](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/fix-php-code-style-issues.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/fix-php-code-style-issues.yml)
-[![codecov](https://codecov.io/gh/richan-fongdasen/turso-laravel/graph/badge.svg?token=eKJSttyUGc)](https://codecov.io/gh/richan-fongdasen/turso-laravel)
-[![Total Downloads](https://img.shields.io/packagist/dt/richan-fongdasen/turso-laravel.svg?style=flat-square)](https://packagist.org/packages/richan-fongdasen/turso-laravel)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/richan-fongdasen/turso-laravel.svg?style=flat-square)](https://packagist.org/packages/richan-fongdasen/turso-laravel) 
+[![License: MIT](https://poser.pugx.org/richan-fongdasen/turso-laravel/license.svg)](https://opensource.org/licenses/MIT) 
+[![PHPStan](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/phpstan.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/phpstan.yml) 
+[![Unit Tests](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/run-tests.yml) 
+[![Code Style](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/fix-php-code-style-issues.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/fix-php-code-style-issues.yml) 
+[![codecov](https://codecov.io/gh/richan-fongdasen/turso-laravel/graph/badge.svg?token=eKJSttyUGc)](https://codecov.io/gh/richan-fongdasen/turso-laravel) 
+[![Total Downloads](https://img.shields.io/packagist/dt/richan-fongdasen/turso-laravel.svg?style=flat-square)](https://packagist.org/packages/richan-fongdasen/turso-laravel) 
 
 This package provides a Turso database driver for Laravel, allowing you to use Turso as your database backend in Laravel applications. The driver communicates with the Turso database server using an HTTP client.
 
