@@ -49,7 +49,7 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
 
                 $replicaPath = (string) data_get($config, 'db_replica');
 
-                if ($replicaPath !== '') {
+                if (($replicaPath !== '') && file_exists($replicaPath)) {
                     $connection->setReadPdo(new PDO('sqlite:' . $replicaPath));
                 }
 
