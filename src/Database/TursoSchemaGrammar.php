@@ -11,7 +11,7 @@ class TursoSchemaGrammar extends SQLiteGrammar
 {
     public function compileDropAllIndexes(): string
     {
-        return "SELECT 'DROP INDEX IF EXISTS \"' || name || '\";' FROM sqlite_schema WHERE type = 'index'";
+        return "SELECT 'DROP INDEX IF EXISTS \"' || name || '\";' FROM sqlite_schema WHERE type = 'index' AND name NOT LIKE 'sqlite_%'";
     }
 
     public function compileDropAllTables(): string
@@ -21,7 +21,7 @@ class TursoSchemaGrammar extends SQLiteGrammar
 
     public function compileDropAllTriggers(): string
     {
-        return "SELECT 'DROP TRIGGER IF EXISTS \"' || name || '\";' FROM sqlite_schema WHERE type = 'trigger'";
+        return "SELECT 'DROP TRIGGER IF EXISTS \"' || name || '\";' FROM sqlite_schema WHERE type = 'trigger' AND name NOT LIKE 'sqlite_%'";
     }
 
     public function compileDropAllViews(): string
