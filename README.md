@@ -1,12 +1,12 @@
 # A Turso database driver for Laravel
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/richan-fongdasen/turso-laravel.svg?style=flat-square)](https://packagist.org/packages/richan-fongdasen/turso-laravel) 
-[![License: MIT](https://poser.pugx.org/richan-fongdasen/turso-laravel/license.svg)](https://opensource.org/licenses/MIT) 
-[![PHPStan](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/phpstan.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/phpstan.yml) 
-[![Unit Tests](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/run-tests.yml) 
-[![Code Style](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/fix-php-code-style-issues.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/fix-php-code-style-issues.yml) 
-[![codecov](https://codecov.io/gh/richan-fongdasen/turso-laravel/graph/badge.svg?token=eKJSttyUGc)](https://codecov.io/gh/richan-fongdasen/turso-laravel) 
-[![Total Downloads](https://img.shields.io/packagist/dt/richan-fongdasen/turso-laravel.svg?style=flat-square)](https://packagist.org/packages/richan-fongdasen/turso-laravel) 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/richan-fongdasen/turso-laravel.svg?style=flat-square)](https://packagist.org/packages/richan-fongdasen/turso-laravel)
+[![License: MIT](https://poser.pugx.org/richan-fongdasen/turso-laravel/license.svg)](https://opensource.org/licenses/MIT)
+[![PHPStan](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/phpstan.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/phpstan.yml)
+[![Unit Tests](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/run-tests.yml)
+[![Code Style](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/fix-php-code-style-issues.yml/badge.svg?branch=main)](https://github.com/richan-fongdasen/turso-laravel/actions/workflows/fix-php-code-style-issues.yml)
+[![codecov](https://codecov.io/gh/richan-fongdasen/turso-laravel/graph/badge.svg?token=eKJSttyUGc)](https://codecov.io/gh/richan-fongdasen/turso-laravel)
+[![Total Downloads](https://img.shields.io/packagist/dt/richan-fongdasen/turso-laravel.svg?style=flat-square)](https://packagist.org/packages/richan-fongdasen/turso-laravel)
 
 This package provides a Turso database driver for Laravel, allowing you to use Turso as your database backend in Laravel applications. The driver communicates with the Turso database server using an HTTP client.
 
@@ -63,6 +63,21 @@ The above command publishes the following files:
 -   `config/turso-laravel.php`
 -   `turso-sync.mjs`
 
+The content of the `config/turso-laravel.php` file should look like this:
+
+```php
+return [
+    'sync_command' => [
+        'node_path'       => env('NODE_PATH'),
+        'script_filename' => 'turso-sync.mjs',
+        'script_path'     => realpath(__DIR__ . '/..'),
+        'timeout'         => 60,
+    ],
+];
+```
+
+You may need to set the `NODE_PATH` environment variable to the path of your Node.js executable. This is required to run the sync script.
+
 ### Installing Node.js Dependencies
 
 The Turso database driver requires Node.js to run the sync script. Install the Node.js dependencies by running the following command:
@@ -96,9 +111,24 @@ DB_FOREIGN_KEYS=true
 
 For local development, you can use the local Turso database server provided by the Turso team. Refer to the [Turso CLI documentation](https://docs.turso.tech/local-development#turso-cli) for instructions on running the local Turso database server.
 
-The Turso database driver should work as expected with Laravel's Query Builder and Eloquent ORM.
+The Turso database driver should work as expected with Laravel's Query Builder and Eloquent ORM. Here are some examples:
+
+```php
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+
+// Using Query Builder
+$users = DB::table('users')->orderBy('name')->get();
+
+// Using Eloquent ORM
+$users = User::with('posts')->orderBy('name')->get();
+```
+
+### Embedded Replica Support
 
 The driver supports the embedded replica feature. If you're unfamiliar with this feature, refer to the [Turso embedded replica article](https://turso.tech/blog/introducing-embedded-replicas-deploy-turso-anywhere-2085aa0dc242) for more information.
+
+> If you're using Turso CLI to run the local Turso database server, there is no need to set the `DB_REPLICA` environment variable. The sync script does not work with the local Turso database server.
 
 ### Running the sync script from artisan command
 
@@ -107,6 +137,8 @@ Run the sync script manually using the following Artisan command:
 ```bash
 php artisan turso:sync
 ```
+
+> You may encounter an error if the path to the replica database does not exist. This is expected when the replica database has not been created yet.
 
 ### Running the sync script programmatically
 
