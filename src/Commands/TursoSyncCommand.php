@@ -6,6 +6,7 @@ namespace RichanFongdasen\Turso\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Process;
+use RuntimeException;
 
 class TursoSyncCommand extends Command
 {
@@ -16,12 +17,24 @@ class TursoSyncCommand extends Command
     protected function compileRunProcess(): string
     {
         return sprintf(
-            'node %s "%s" "%s" "%s"',
+            '%s %s "%s" "%s" "%s"',
+            $this->getNodePath(),
             config('turso-laravel.sync_command.script_filename'),
             config('database.connections.turso.db_url'),
             config('database.connections.turso.access_token'),
             config('database.connections.turso.db_replica'),
         );
+    }
+
+    protected function getNodePath(): string
+    {
+        $nodePath = config('turso-laravel.sync_command.node_path') ?? trim((string) Process::run('which node')->output());
+
+        if (($nodePath === '') || ! file_exists($nodePath)) {
+            throw new RuntimeException('Node executable not found.');
+        }
+
+        return $nodePath;
     }
 
     public function handle(): int
@@ -33,9 +46,7 @@ class TursoSyncCommand extends Command
             ->run($this->compileRunProcess());
 
         if ($result->failed()) {
-            $this->error($result->errorOutput());
-
-            return self::FAILURE;
+            throw new RuntimeException('Turso sync command failed: ' . $result->errorOutput());
         }
 
         $this->info($result->output());
