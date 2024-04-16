@@ -6,14 +6,47 @@ namespace RichanFongdasen\Turso\Database;
 
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Str;
 
 class TursoConnection extends SQLiteConnection
 {
     protected bool $hasUpdated = false;
 
+    protected static array $updatingStatements = [
+        'alter',
+        'create',
+        'delete',
+        'drop',
+        'insert',
+        'truncate',
+        'update',
+    ];
+
     public function __construct(TursoPDO $pdo, string $database = ':memory:', string $tablePrefix = '', array $config = [])
     {
         parent::__construct($pdo, $database, $tablePrefix, $config);
+    }
+
+    /**
+     * Run an SQL statement and get the number of rows affected.
+     *
+     * @param string $query
+     * @param array  $bindings
+     *
+     * @return int
+     */
+    public function affectingStatement($query, $bindings = [])
+    {
+        if ($this->queryIsUpdatingRemoteDB($query)) {
+            $this->hasUpdated = true;
+        }
+
+        return parent::affectingStatement($query, $bindings);
+    }
+
+    protected function queryIsUpdatingRemoteDB(string $query): bool
+    {
+        return Str::startsWith(trim(strtolower($query)), self::$updatingStatements);
     }
 
     /**
@@ -70,53 +103,25 @@ class TursoConnection extends SQLiteConnection
         return new TursoQueryProcessor();
     }
 
+    public function hasUpdated(): bool
+    {
+        return $this->hasUpdated;
+    }
+
     /**
-     * Run an insert statement against the database.
+     * Execute an SQL statement and return the boolean result.
      *
      * @param string $query
      * @param array  $bindings
      *
      * @return bool
      */
-    public function insert($query, $bindings = [])
+    public function statement($query, $bindings = [])
     {
-        $this->hasUpdated = true;
+        if ($this->queryIsUpdatingRemoteDB($query)) {
+            $this->hasUpdated = true;
+        }
 
-        return parent::insert($query, $bindings);
-    }
-
-    /**
-     * Run an update statement against the database.
-     *
-     * @param string $query
-     * @param array  $bindings
-     *
-     * @return int
-     */
-    public function update($query, $bindings = [])
-    {
-        $this->hasUpdated = true;
-
-        return parent::update($query, $bindings);
-    }
-
-    /**
-     * Run a delete statement against the database.
-     *
-     * @param string $query
-     * @param array  $bindings
-     *
-     * @return int
-     */
-    public function delete($query, $bindings = [])
-    {
-        $this->hasUpdated = true;
-
-        return parent::delete($query, $bindings);
-    }
-
-    public function hasUpdated(): bool
-    {
-        return $this->hasUpdated;
+        return parent::statement($query, $bindings);
     }
 }

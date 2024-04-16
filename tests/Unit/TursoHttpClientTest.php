@@ -27,6 +27,7 @@ test('it can log queries', function () {
     ];
 
     Turso::enableQueryLog();
+    Turso::freshRequest();
 
     Turso::query($query['statement'], $query['bindings']);
 
@@ -38,6 +39,8 @@ test('it raises exception on any HTTP errors', function () {
     Http::fake([
         '*' => Http::response(['message' => 'Internal Server Error'], 500),
     ]);
+
+    Turso::freshRequest();
 
     Turso::query('SELECT * FROM "users"');
 })->throws(RequestException::class)->group('TursoClient', 'UnitTest');
@@ -73,6 +76,7 @@ test('it can replace the base url with the one that suggested by turso response'
         ),
     ]);
 
+    Turso::freshRequest();
     Turso::query('SELECT * FROM "users"');
 
     expect(Turso::getBaseUrl())->toBe('http://base-url-example.turso.io');

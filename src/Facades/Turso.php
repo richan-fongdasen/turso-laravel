@@ -10,6 +10,7 @@ use RichanFongdasen\Turso\TursoManager;
 /**
  * @see \RichanFongdasen\Turso\TursoHttpClient
  *
+ * @mixin \RichanFongdasen\Turso\TursoManager
  * @mixin \RichanFongdasen\Turso\TursoHttpClient
  */
 class Turso extends Facade

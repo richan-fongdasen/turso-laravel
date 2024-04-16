@@ -177,7 +177,7 @@ class TursoHttpClient
     public function resetClientState(): void
     {
         $this->baton = null;
-        $this->baseUrl = data_get($this->config, 'db_url');
+        $this->baseUrl = (string) data_get($this->config, 'db_url', '');
         $this->isOpen = false;
     }
 }

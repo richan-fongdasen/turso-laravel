@@ -1,2 +1,4 @@
 parameters:
     treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        - '#Variable method call on RichanFongdasen\\Turso\\TursoHttpClient.#'

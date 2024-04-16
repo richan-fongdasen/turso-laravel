@@ -59,13 +59,12 @@ class TursoManager
         }
     }
 
-    public function __call(string $methodName, array $arguments = []): mixed
+    public function __call(string $method, array $arguments = []): mixed
     {
-        if (! method_exists($this->client, $methodName)) {
-            throw new BadMethodCallException('Call to undefined method ' . static::class . '::' . $methodName . '()');
+        if (! method_exists($this->client, $method)) {
+            throw new BadMethodCallException('Call to undefined method ' . static::class . '::' . $method . '()');
         }
 
-        // @phpstan-ignore-next-line
-        return call_user_func_array([$this->client, $methodName], $arguments);
+        return $this->client->$method(...$arguments);
     }
 }

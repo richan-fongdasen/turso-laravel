@@ -36,5 +36,6 @@ class TestCase extends Orchestra
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ]);
         config()->set('database.default', 'turso');
+        config()->set('queue.default', 'sync');
     }
 }

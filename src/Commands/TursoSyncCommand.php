@@ -17,7 +17,7 @@ class TursoSyncCommand extends Command
     {
         return sprintf(
             'node %s "%s" "%s" "%s"',
-            config('turso-laravel.sync.script_filename'),
+            config('turso-laravel.sync_command.script_filename'),
             config('database.connections.turso.db_url'),
             config('database.connections.turso.access_token'),
             config('database.connections.turso.db_replica'),
@@ -26,10 +26,10 @@ class TursoSyncCommand extends Command
 
     public function handle(): int
     {
-        $timeout = (int) config('turso-laravel.sync.timeout');
+        $timeout = (int) config('turso-laravel.sync_command.timeout');
 
         $result = Process::timeout($timeout)
-            ->path(config('turso-laravel.sync.script_path') ?? base_path())
+            ->path(config('turso-laravel.sync_command.script_path') ?? base_path())
             ->run($this->compileRunProcess());
 
         if ($result->failed()) {
