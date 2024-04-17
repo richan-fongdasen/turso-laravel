@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace RichanFongdasen\Turso\Database;
 
-use Illuminate\Database\SQLiteConnection;
+use Exception;
+use Illuminate\Database\Connection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
+use PDO;
 
-class TursoConnection extends SQLiteConnection
+class TursoConnection extends Connection
 {
     protected bool $hasUpdated = false;
 
@@ -44,14 +46,33 @@ class TursoConnection extends SQLiteConnection
         return parent::affectingStatement($query, $bindings);
     }
 
-    protected function queryIsUpdatingRemoteDB(string $query): bool
+    public function createReadPdo(array $config = []): ?PDO
     {
-        return Str::startsWith(trim(strtolower($query)), self::$updatingStatements);
+        $replicaPath = (string) data_get($config, 'db_replica');
+
+        if (($replicaPath === '') || ! file_exists($replicaPath)) {
+            return null;
+        }
+
+        $pdo = new PDO('sqlite:' . $replicaPath);
+
+        $this->setReadPdo($pdo);
+
+        return $pdo;
     }
 
-    /**
-     * Get the default query grammar instance.
-     */
+    protected function escapeBinary(mixed $value): string
+    {
+        $hex = bin2hex($value);
+
+        return "x'{$hex}'";
+    }
+
+    protected function getDefaultPostProcessor(): TursoQueryProcessor
+    {
+        return new TursoQueryProcessor();
+    }
+
     protected function getDefaultQueryGrammar(): TursoQueryGrammar
     {
         $grammar = new TursoQueryGrammar();
@@ -62,21 +83,6 @@ class TursoConnection extends SQLiteConnection
         return $grammar;
     }
 
-    /**
-     * Get a schema builder instance for the connection.
-     */
-    public function getSchemaBuilder(): TursoSchemaBuilder
-    {
-        if (is_null($this->schemaGrammar)) {
-            $this->useDefaultSchemaGrammar();
-        }
-
-        return new TursoSchemaBuilder($this);
-    }
-
-    /**
-     * Get the default schema grammar instance.
-     */
     protected function getDefaultSchemaGrammar(): TursoSchemaGrammar
     {
         $grammar = new TursoSchemaGrammar();
@@ -87,25 +93,33 @@ class TursoConnection extends SQLiteConnection
         return $grammar;
     }
 
-    /**
-     * Get the schema state for the connection.
-     */
+    public function getSchemaBuilder(): TursoSchemaBuilder
+    {
+        if (is_null($this->schemaGrammar)) {
+            $this->useDefaultSchemaGrammar();
+        }
+
+        return new TursoSchemaBuilder($this);
+    }
+
     public function getSchemaState(?Filesystem $files = null, ?callable $processFactory = null): TursoSchemaState
     {
         return new TursoSchemaState($this, $files, $processFactory);
     }
 
-    /**
-     * Get the default post processor instance.
-     */
-    protected function getDefaultPostProcessor(): TursoQueryProcessor
-    {
-        return new TursoQueryProcessor();
-    }
-
     public function hasUpdated(): bool
     {
         return $this->hasUpdated;
+    }
+
+    protected function isUniqueConstraintError(Exception $exception): bool
+    {
+        return boolval(preg_match('#(column(s)? .* (is|are) not unique|UNIQUE constraint failed: .*)#i', $exception->getMessage()));
+    }
+
+    protected function queryIsUpdatingRemoteDB(string $query): bool
+    {
+        return Str::startsWith(trim(strtolower($query)), self::$updatingStatements);
     }
 
     /**

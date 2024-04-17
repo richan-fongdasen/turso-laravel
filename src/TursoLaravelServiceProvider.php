@@ -9,7 +9,6 @@ use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Facades\Event;
-use PDO;
 use RichanFongdasen\Turso\Commands\TursoSyncCommand;
 use RichanFongdasen\Turso\Database\TursoConnection;
 use RichanFongdasen\Turso\Database\TursoConnector;
@@ -46,7 +45,6 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
                 (app('running-artisan-command') === data_get($event, 'command'))
             ) {
                 Turso::sync();
-                Turso::enableReadReplica();
             }
         });
     }
@@ -84,11 +82,7 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
                 $connection = new TursoConnection($pdo, $database ?? 'turso', $prefix, $config);
                 app()->instance(TursoConnection::class, $connection);
 
-                $replicaPath = (string) data_get($config, 'db_replica');
-
-                if (($replicaPath !== '') && file_exists($replicaPath)) {
-                    $connection->setReadPdo(new PDO('sqlite:' . $replicaPath));
-                }
+                $connection->createReadPdo($config);
 
                 return $connection;
             });

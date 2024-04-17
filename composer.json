@@ -66,8 +66,8 @@
             "@php vendor/bin/testbench serve --host=0.0.0.0"
         ],
         "analyse": "vendor/bin/phpstan analyse",
-        "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage",
+        "test": "vendor/bin/pest --stop-on-failure --stop-on-error",
+        "test-coverage": "vendor/bin/pest --coverage --stop-on-failure --stop-on-error",
         "format": "vendor/bin/pint"
     },
     "config": {

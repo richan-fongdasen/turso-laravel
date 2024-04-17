@@ -62,6 +62,8 @@ class TursoManager
         }
 
         Artisan::call('turso:sync');
+
+        $this->enableReadReplica();
     }
 
     public function __call(string $method, array $arguments = []): mixed
