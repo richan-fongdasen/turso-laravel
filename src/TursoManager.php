@@ -8,6 +8,7 @@ use BadMethodCallException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use LogicException;
 use PDO;
 use RichanFongdasen\Turso\Jobs\TursoSyncJob;
 
@@ -27,9 +28,11 @@ class TursoManager
 
     public function backgroundSync(): void
     {
-        if ($this->config->get('db_replica', false) !== false) {
-            TursoSyncJob::dispatch();
+        if ((string) $this->config->get('db_replica') === '') {
+            throw new LogicException('Turso Error: You cannot sync the data when the read replica is not enabled.');
         }
+
+        TursoSyncJob::dispatch();
     }
 
     public function disableReadReplica(): bool
@@ -54,9 +57,11 @@ class TursoManager
 
     public function sync(): void
     {
-        if ($this->config->get('db_replica', false) !== false) {
-            Artisan::call('turso:sync');
+        if ((string) $this->config->get('db_replica') === '') {
+            throw new LogicException('Turso Error: You cannot sync the data when the read replica is not enabled.');
         }
+
+        Artisan::call('turso:sync');
     }
 
     public function __call(string $method, array $arguments = []): mixed

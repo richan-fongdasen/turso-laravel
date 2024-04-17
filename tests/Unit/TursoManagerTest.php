@@ -48,6 +48,14 @@ test('it raises exception on calling an undefined method', function () {
     Turso::undefinedMethod();
 })->throws(\BadMethodCallException::class)->group('TursoManagerTest', 'UnitTest');
 
+test('it raises exception on calling the sync() method without configuring the read replica', function () {
+    Turso::sync();
+})->throws(\LogicException::class)->group('TursoManagerTest', 'UnitTest');
+
+test('it raises exception on calling the backgroundSync() method without configuring the read replica', function () {
+    Turso::backgroundSync();
+})->throws(\LogicException::class)->group('TursoManagerTest', 'UnitTest');
+
 test('it can trigger the sync command immediately', function () {
     Process::fake();
 
