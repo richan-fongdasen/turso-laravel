@@ -148,7 +148,7 @@ Run the sync script programmatically using the following code:
 use Illuminate\Support\Facades\DB;
 use RichanFongdasen\Turso\Facades\Turso;
 
-if ( DB::hasUpdated() ) {
+if ( DB::connection('turso')->hasUpdated() ) {
     // Run the sync script immediately
     Turso::sync();
 
