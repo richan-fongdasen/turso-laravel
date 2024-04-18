@@ -16,11 +16,6 @@ Some features are not yet supported by this package:
 
 -   Creating and dropping database
 -   [Database Transactions](https://turso.tech/blog/bring-your-own-sdk-with-tursos-http-api-ff4ccbed)
--   [Turso Batch Request](https://github.com/tursodatabase/libsql/blob/main/docs/HTTP_V2_SPEC.md#execute-a-batch)
--   [Turso Sequence Request](https://github.com/tursodatabase/libsql/blob/main/docs/HTTP_V2_SPEC.md#execute-a-sequence-of-sql-statements)
--   [Turso Describe Request](https://github.com/tursodatabase/libsql/blob/main/docs/HTTP_V2_SPEC.md#describe-a-statement)
--   [Turso Store SQL Request](https://github.com/tursodatabase/libsql/blob/main/docs/HTTP_V2_SPEC.md#store-an-sql-text-on-the-server)
--   [Turso Close Stored SQL Request](https://github.com/tursodatabase/libsql/blob/main/docs/HTTP_V2_SPEC.md#close-a-stored-sql-text)
 
 ## Requirements
 
