@@ -123,8 +123,6 @@ $users = User::with('posts')->orderBy('name')->get();
 
 The driver supports the embedded replica feature. If you're unfamiliar with this feature, refer to the [Turso embedded replica article](https://turso.tech/blog/introducing-embedded-replicas-deploy-turso-anywhere-2085aa0dc242) for more information.
 
-> If you're using Turso CLI to run the local Turso database server, there is no need to set the `DB_REPLICA` environment variable. The sync script does not work with the local Turso database server.
-
 ### Running the sync script from artisan command
 
 Run the sync script manually using the following Artisan command:
