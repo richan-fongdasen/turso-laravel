@@ -15,7 +15,7 @@ test('it can run the cli script to sync the database', function () {
     Artisan::call('turso:sync');
 
     Process::assertRan(function (PendingProcess $process) {
-        $expectedPath = realpath(__DIR__ . '/../..');
+        $expectedPath = realpath(__DIR__ . '/../../..');
 
         expect($process->command)->toBe('/dev/null turso-sync.mjs "http://127.0.0.1:8080" "your-access-token" "/tmp/turso.sqlite"')
             ->and($process->timeout)->toBe(60)

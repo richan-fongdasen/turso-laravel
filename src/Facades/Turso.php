@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Facade;
 use RichanFongdasen\Turso\TursoManager;
 
 /**
- * @see \RichanFongdasen\Turso\TursoHttpClient
+ * @see \RichanFongdasen\Turso\TursoClient
  *
  * @mixin \RichanFongdasen\Turso\TursoManager
- * @mixin \RichanFongdasen\Turso\TursoHttpClient
+ * @mixin \RichanFongdasen\Turso\TursoClient
  */
 class Turso extends Facade
 {

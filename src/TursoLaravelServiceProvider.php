@@ -22,7 +22,10 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
     {
         parent::boot();
 
-        if (config('database.default') !== 'turso') {
+        if (
+            (config('database.default') !== 'turso') ||
+            ((string) config('database.connections.turso.db_replica') === '')
+        ) {
             return;
         }
 

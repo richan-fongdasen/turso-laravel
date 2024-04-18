@@ -9,6 +9,7 @@ use PDO;
 use PDOException;
 use PDOStatement;
 use RichanFongdasen\Turso\Facades\Turso;
+use RichanFongdasen\Turso\Http\QueryResponse;
 
 /**
  * Turso PDO Statement.
@@ -24,14 +25,13 @@ class TursoPDOStatement extends PDOStatement
 
     protected array $bindings = [];
 
-    protected ?Collection $responses = null;
+    protected ?QueryResponse $response = null;
 
     public function __construct(
         protected TursoPDO $pdo,
         protected string $query,
         protected array $options = [],
     ) {
-        $this->responses = new Collection();
     }
 
     public function setFetchMode(int $mode, mixed ...$args): bool
@@ -88,16 +88,14 @@ class TursoPDOStatement extends PDOStatement
                 $this->bindValue($key, $value, $type);
             });
 
-        $rawResponse = Turso::query($this->query, array_values($this->bindings));
-        $this->responses = $this->formatResponse($rawResponse);
+        $this->response = Turso::query($this->query, array_values($this->bindings));
 
-        $lastId = (int) data_get($rawResponse, 'result.last_insert_rowid', 0);
-
+        $lastId = (int) $this->response->getLastInsertId();
         if ($lastId > 0) {
             $this->pdo->setLastInsertId(value: $lastId);
         }
 
-        $this->affectedRows = (int) data_get($rawResponse, 'result.affected_row_count', 0);
+        $this->affectedRows = $this->response->getAffectedRows();
 
         return true;
     }
@@ -108,7 +106,7 @@ class TursoPDOStatement extends PDOStatement
             $mode = $this->fetchMode;
         }
 
-        $response = $this->responses?->shift();
+        $response = $this->response?->getRows()->shift();
 
         if ($response === null) {
             return false;
@@ -129,7 +127,7 @@ class TursoPDOStatement extends PDOStatement
 
     public function fetchAll(int $mode = PDO::FETCH_DEFAULT, ...$args): array
     {
-        if (! ($this->responses instanceof Collection)) {
+        if (! ($this->response instanceof QueryResponse)) {
             return [];
         }
 
@@ -137,53 +135,24 @@ class TursoPDOStatement extends PDOStatement
             $mode = $this->fetchMode;
         }
 
+        $allRows = $this->response->getRows();
+
         $response = match ($mode) {
-            PDO::FETCH_BOTH => $this->responses->map(function (Collection $row) {
+            PDO::FETCH_BOTH => $allRows->map(function (Collection $row) {
                 return array_merge($row->toArray(), $row->values()->toArray());
             })->toArray(),
-            PDO::FETCH_ASSOC, PDO::FETCH_NAMED => $this->responses->toArray(),
-            PDO::FETCH_NUM => $this->responses->map(function (Collection $row) {
+            PDO::FETCH_ASSOC, PDO::FETCH_NAMED => $allRows->toArray(),
+            PDO::FETCH_NUM => $allRows->map(function (Collection $row) {
                 return $row->values()->toArray();
             })->toArray(),
-            PDO::FETCH_OBJ => $this->responses->map(function (Collection $row) {
+            PDO::FETCH_OBJ => $allRows->map(function (Collection $row) {
                 return (object) $row->toArray();
             })->toArray(),
 
             default => throw new PDOException('Unsupported fetch mode.'),
         };
 
-        $this->responses = new Collection();
-
-        return $response;
-    }
-
-    protected function formatResponse(array $originalResponse): Collection
-    {
-        $response = new Collection();
-        $columns = collect((array) data_get($originalResponse, 'result.cols', []))
-            ->keyBy('name')
-            ->keys()
-            ->all();
-
-        $rows = collect((array) data_get($originalResponse, 'result.rows', []))
-            ->each(function (array $item) use (&$response, $columns) {
-                $row = new Collection();
-
-                collect($item)
-                    ->each(function (array $column, int $index) use (&$row, $columns) {
-                        $value = match ($column['type']) {
-                            'blob'    => base64_decode((string) $column['value'], true),
-                            'integer' => (int) $column['value'],
-                            'float'   => (float) $column['value'],
-                            'null'    => null,
-                            default   => (string) $column['value'],
-                        };
-
-                        $row->put(data_get($columns, $index), $value);
-                    });
-
-                $response->push($row);
-            });
+        // $this->responses = new Collection();
 
         return $response;
     }
@@ -201,6 +170,6 @@ class TursoPDOStatement extends PDOStatement
 
     public function rowCount(): int
     {
-        return $this->responses?->count() ?? 0;
+        return $this->response?->getRows()->count() ?? 0;
     }
 }

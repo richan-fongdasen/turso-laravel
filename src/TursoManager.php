@@ -14,7 +14,7 @@ use RichanFongdasen\Turso\Jobs\TursoSyncJob;
 
 class TursoManager
 {
-    protected TursoHttpClient $client;
+    protected TursoClient $client;
 
     protected Collection $config;
 
@@ -23,7 +23,7 @@ class TursoManager
     public function __construct(array $config = [])
     {
         $this->config = new Collection($config);
-        $this->client = new TursoHttpClient($config);
+        $this->client = new TursoClient($config);
     }
 
     public function backgroundSync(): void

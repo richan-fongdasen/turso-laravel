@@ -27,6 +27,8 @@ class TursoConnection extends Connection
     public function __construct(TursoPDO $pdo, string $database = ':memory:', string $tablePrefix = '', array $config = [])
     {
         parent::__construct($pdo, $database, $tablePrefix, $config);
+
+        $this->schemaGrammar = $this->getDefaultSchemaGrammar();
     }
 
     /**

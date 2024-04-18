@@ -16,22 +16,30 @@ test('it returns false on enabling read replica when read replica is not configu
 test('it can disable the read replica database connection', function () {
     DB::connection('turso')->setReadPdo(new \PDO('sqlite::memory:'));
 
-    Http::fake();
+    fakeHttpRequest();
 
     Turso::disableReadReplica();
-    Turso::resetClientState();
+    Turso::resetHttpClientState();
 
     Turso::query('SELECT * FROM sqlite_master');
 
     Http::assertSent(function (Request $request) {
         expect($request->url())->toBe('http://127.0.0.1:8080/v3/pipeline')
             ->and($request->data())->toBe([
-                'requests' => [[
-                    'type' => 'execute',
-                    'stmt' => [
-                        'sql' => 'SELECT * FROM sqlite_master',
+                'requests' => [
+                    [
+                        'type' => 'execute',
+                        'stmt' => [
+                            'sql' => 'PRAGMA foreign_keys = ON;',
+                        ],
                     ],
-                ]],
+                    [
+                        'type' => 'execute',
+                        'stmt' => [
+                            'sql' => 'SELECT * FROM sqlite_master',
+                        ],
+                    ],
+                ],
             ]);
 
         return true;
