@@ -9,7 +9,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use LogicException;
-use PDO;
 use RichanFongdasen\Turso\Jobs\TursoSyncJob;
 
 class TursoManager
@@ -17,8 +16,6 @@ class TursoManager
     protected TursoClient $client;
 
     protected Collection $config;
-
-    protected ?PDO $readPdo = null;
 
     public function __construct(array $config = [])
     {
@@ -35,26 +32,6 @@ class TursoManager
         TursoSyncJob::dispatch();
     }
 
-    public function disableReadReplica(): bool
-    {
-        $this->readPdo = DB::connection('turso')->getReadPdo();
-
-        DB::connection('turso')->setReadPdo(null);
-
-        return true;
-    }
-
-    public function enableReadReplica(): bool
-    {
-        if ($this->readPdo === null) {
-            return false;
-        }
-
-        DB::connection('turso')->setReadPdo($this->readPdo);
-
-        return true;
-    }
-
     public function sync(): void
     {
         if ((string) $this->config->get('db_replica') === '') {
@@ -63,7 +40,7 @@ class TursoManager
 
         Artisan::call('turso:sync');
 
-        $this->enableReadReplica();
+        DB::forgetRecordModificationState();
     }
 
     public function __call(string $method, array $arguments = []): mixed

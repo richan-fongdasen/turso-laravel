@@ -117,3 +117,12 @@ test('it can perform query execution with binding values', function () {
     expect($result['migration'])->toBe('CreateUsersTable')
         ->and($result['batch'])->toBe(1);
 })->group('TursoPDOStatementTest', 'FeatureTest');
+
+test('it can perform update statement with binding values', function () {
+    DB::statement('INSERT INTO "migrations" ("migration", "batch") VALUES (?, ?)', ['CreateUsersTable', 1]);
+
+    $statement = $this->pdo->prepare('UPDATE "migrations" SET "migration" = ? WHERE "id" = ?');
+    $statement->execute(['CreateRolesTable', 1]);
+
+    expect($statement->rowCount())->toBe(1);
+})->group('TursoPDOStatementTest', 'FeatureTest');

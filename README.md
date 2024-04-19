@@ -47,6 +47,7 @@ To use Turso as your database driver in Laravel, append the following configurat
     'database'                => null, // Leave this null
     'prefix'                  => env('DB_PREFIX', ''),
     'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+    'sticky'                  => env('DB_STICKY', true),
 ],
 ```
 
@@ -97,6 +98,7 @@ DB_ACCESS_TOKEN=
 DB_REPLICA=
 DB_PREFIX=
 DB_FOREIGN_KEYS=true
+DB_STICKY=true
 ```
 
 | ENV Variable Name | Description                                                                                    |
@@ -106,6 +108,7 @@ DB_FOREIGN_KEYS=true
 | DB_REPLICA        | (Optional) The full path to the local embedded replica database file. E.g: `/tmp/turso.sqlite` |
 | DB_PREFIX         | (Optional) The database table prefix.                                                          |
 | DB_FOREIGN_KEYS   | Enable or disable foreign key constraints, default is `true`.                                  |
+| DB_STICKY         | Enable or disable sticky connections while performing write operations, default is `true`.     |
 
 ## Usage
 
@@ -148,29 +151,13 @@ Run the sync script programmatically using the following code:
 use Illuminate\Support\Facades\DB;
 use RichanFongdasen\Turso\Facades\Turso;
 
-if ( DB::connection('turso')->hasUpdated() ) {
+if ( DB::hasModifiedRecords() ) {
     // Run the sync script immediately
     Turso::sync();
 
     // Run the sync script in the background
     Turso::backgroundSync();
 }
-```
-
-### Disabling/enabling the read replica
-
-If you have configured the read replica in your database configuration, the database connection to the Turso embedded read replica is enabled by default. However, you may want to disable it when performing chained read-write operations directly on the remote database. You can disable the read replica using the following code:
-
-```php
-use RichanFongdasen\Turso\Facades\Turso;
-
-// Disable the read replica
-Turso::disableReadReplica();
-
-// Re-enable the read replica
-// Note that the replica may not contain the latest data
-// related to recent write operations performed on the remote database
-Turso::enableReadReplica();
 ```
 
 ## Debugging

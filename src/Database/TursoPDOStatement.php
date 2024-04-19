@@ -170,6 +170,6 @@ class TursoPDOStatement extends PDOStatement
 
     public function rowCount(): int
     {
-        return $this->response?->getRows()->count() ?? 0;
+        return max((int) $this->response?->getRows()->count(), $this->affectedRows);
     }
 }

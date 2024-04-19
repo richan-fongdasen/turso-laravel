@@ -8,6 +8,7 @@ use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use RichanFongdasen\Turso\Commands\TursoSyncCommand;
 use RichanFongdasen\Turso\Database\TursoConnection;
@@ -33,8 +34,6 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
             if (! app()->bound('running-artisan-command')) {
                 app()->instance('running-artisan-command', data_get($event, 'command'));
             }
-
-            Turso::disableReadReplica();
         });
 
         Event::listen(function (CommandFinished $event) {
@@ -43,8 +42,7 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
             }
 
             if (
-                app()->bound(TursoConnection::class) &&
-                app(TursoConnection::class)->hasUpdated() &&
+                DB::hasModifiedRecords() &&
                 (app('running-artisan-command') === data_get($event, 'command'))
             ) {
                 Turso::sync();

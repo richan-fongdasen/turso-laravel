@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 class TursoSyncJob implements ShouldQueue
 {
@@ -24,5 +25,7 @@ class TursoSyncJob implements ShouldQueue
     public function handle(): void
     {
         Artisan::call('turso:sync');
+
+        DB::forgetRecordModificationState();
     }
 }

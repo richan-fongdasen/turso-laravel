@@ -34,6 +34,7 @@ class TestCase extends Orchestra
             'prefix'                  => env('DB_PREFIX', ''),
             'access_token'            => 'your-access-token',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+            'sticky'                  => env('DB_STICKY', true),
         ]);
         config()->set('database.default', 'turso');
         config()->set('queue.default', 'sync');

@@ -61,7 +61,8 @@ test('it can update an existing record with updateOrInsert method', function () 
 
     $updatedUser = DB::table('users')->find($this->user->getKey());
 
-    expect(DB::table('users')->count())->toBe(1)
+    expect(DB::hasModifiedRecords())->toBeTrue()
+        ->and(DB::table('users')->count())->toBe(1)
         ->and($updatedUser->remember_token)->toBe('1234567890');
 })->group('UpdateStatementTest', 'QueryBuilder', 'FeatureTest');
 
