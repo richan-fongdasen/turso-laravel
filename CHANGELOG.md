@@ -2,6 +2,10 @@
 
 All notable changes to `richan-fongdasen/turso-laravel` will be documented in this file.
 
+## 0.5.0 - 2024-04-20
+
+Dropped several features which are already provided by the Laravel framework.
+
 ## 0.4.0 - 2024-04-18
 
 * Calling `Turso::sync()` without specifying the `DB_REPLICA` path raises an exception.
