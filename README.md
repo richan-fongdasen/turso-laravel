@@ -10,6 +10,8 @@
 
 This package provides a Turso database driver for Laravel, allowing you to use Turso as your database backend in Laravel applications. The driver communicates with the Turso database server using an HTTP client.
 
+You can find a demo application that uses this Turso database driver in the [richan-fongdasen/pingcrm](https://github.com/richan-fongdasen/pingcrm) repository.
+
 ## Unsupported Features
 
 Some features are not yet supported by this package:
