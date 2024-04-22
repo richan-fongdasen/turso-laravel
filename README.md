@@ -12,13 +12,6 @@ This package provides a Turso database driver for Laravel, allowing you to use T
 
 You can find a demo application that uses this Turso database driver in the [richan-fongdasen/pingcrm](https://github.com/richan-fongdasen/pingcrm) repository.
 
-## Unsupported Features
-
-Some features are not yet supported by this package:
-
--   Creating and dropping database
--   [Database Transactions](https://turso.tech/blog/bring-your-own-sdk-with-tursos-http-api-ff4ccbed)
-
 ## Requirements
 
 -   PHP 8.2 or higher

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace RichanFongdasen\Turso\Database;
 
 use PDO;
-use RichanFongdasen\Turso\Exceptions\FeatureNotSupportedException;
 
 /**
  * Turso PDO Database Connection.
@@ -14,9 +13,14 @@ use RichanFongdasen\Turso\Exceptions\FeatureNotSupportedException;
  * that is used by the Turso database driver.
  *
  * see: https://www.php.net/manual/en/class.pdo.php
+ *
+ * Turso database transactions & interactive queries reference:
+ * https://docs.turso.tech/sdk/http/reference#interactive-query
  */
 class TursoPDO extends PDO
 {
+    protected bool $inTransaction = false;
+
     protected array $lastInsertIds = [];
 
     public function __construct(
@@ -30,12 +34,18 @@ class TursoPDO extends PDO
 
     public function beginTransaction(): bool
     {
-        throw new FeatureNotSupportedException('Database transaction is not supported by the current Turso database driver.');
+        $this->inTransaction = $this->prepare('BEGIN')->execute();
+
+        return $this->inTransaction;
     }
 
     public function commit(): bool
     {
-        throw new FeatureNotSupportedException('Database transaction is not supported by the current Turso database driver.');
+        $result = $this->prepare('COMMIT')->execute();
+
+        $this->inTransaction = false;
+
+        return $result;
     }
 
     public function exec(string $queryStatement): int
@@ -43,12 +53,12 @@ class TursoPDO extends PDO
         $statement = $this->prepare($queryStatement);
         $statement->execute();
 
-        return $statement->getAffectedRows();
+        return $statement->rowCount();
     }
 
     public function inTransaction(): bool
     {
-        return false;
+        return $this->inTransaction;
     }
 
     public function lastInsertId(?string $name = null): string|false
@@ -69,7 +79,11 @@ class TursoPDO extends PDO
 
     public function rollBack(): bool
     {
-        throw new FeatureNotSupportedException('Database transaction is not supported by the current Turso database driver.');
+        $result = $this->prepare('ROLLBACK')->execute();
+
+        $this->inTransaction = false;
+
+        return $result;
     }
 
     public function setLastInsertId(?string $name = null, ?int $value = null): void
