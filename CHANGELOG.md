@@ -2,6 +2,10 @@
 
 All notable changes to `richan-fongdasen/turso-laravel` will be documented in this file.
 
+## 0.6.0 - 2024-04-22
+
+Enable database transactions feature.
+
 ## 0.5.0 - 2024-04-20
 
 Dropped several features which are already provided by the Laravel framework.
