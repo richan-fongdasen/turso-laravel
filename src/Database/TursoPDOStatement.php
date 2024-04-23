@@ -47,10 +47,14 @@ class TursoPDOStatement extends PDOStatement
             $type = PDO::PARAM_NULL;
         }
 
+        if ($type === PDO::PARAM_STR && (! ctype_print($value) || ! mb_check_encoding($value, 'UTF-8'))) {
+            $type = PDO::PARAM_LOB;
+        }
+
         $this->bindings[$param] = match ($type) {
             PDO::PARAM_LOB => [
-                'type'  => 'blob',
-                'value' => base64_encode($value),
+                'type'   => 'blob',
+                'base64' => base64_encode(base64_encode($value)),
             ],
             PDO::PARAM_BOOL => [
                 'type'  => 'boolean',

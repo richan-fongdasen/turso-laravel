@@ -77,7 +77,7 @@ class QueryResponse
                 collect($item)
                     ->each(function (array $column, int $index) use (&$row) {
                         $value = match ($column['type']) {
-                            'blob'    => base64_decode((string) $column['value'], true),
+                            'blob'    => base64_decode((string) base64_decode((string) $column['base64'], true), true),
                             'integer' => (int) $column['value'],
                             'float'   => (float) $column['value'],
                             'null'    => null,
