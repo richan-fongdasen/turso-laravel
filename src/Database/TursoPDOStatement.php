@@ -8,6 +8,8 @@ use Illuminate\Support\Collection;
 use PDO;
 use PDOException;
 use PDOStatement;
+use RichanFongdasen\Turso\Enums\PdoParam;
+use RichanFongdasen\Turso\Enums\TursoType;
 use RichanFongdasen\Turso\Facades\Turso;
 use RichanFongdasen\Turso\Http\QueryResponse;
 
@@ -41,38 +43,11 @@ class TursoPDOStatement extends PDOStatement
         return true;
     }
 
-    public function bindValue(string|int $param, mixed $value, $type = PDO::PARAM_STR): bool
+    public function bindValue(string|int $param, mixed $value, int $type = PDO::PARAM_STR): bool
     {
-        if ($value === null) {
-            $type = PDO::PARAM_NULL;
-        }
+        $type = TursoType::fromValue($value);
 
-        if ($type === PDO::PARAM_STR && (! ctype_print($value) || ! mb_check_encoding($value, 'UTF-8'))) {
-            $type = PDO::PARAM_LOB;
-        }
-
-        $this->bindings[$param] = match ($type) {
-            PDO::PARAM_LOB => [
-                'type'   => 'blob',
-                'base64' => base64_encode(base64_encode($value)),
-            ],
-            PDO::PARAM_BOOL => [
-                'type'  => 'boolean',
-                'value' => (string) ((int) $value),
-            ],
-            PDO::PARAM_INT => [
-                'type'  => 'integer',
-                'value' => (string) $value,
-            ],
-            PDO::PARAM_NULL => [
-                'type'  => 'null',
-                'value' => 'null',
-            ],
-            default => [
-                'type'  => 'text',
-                'value' => (string) $value,
-            ],
-        };
+        $this->bindings[$param] = $type->bind($value);
 
         return true;
     }
@@ -81,15 +56,9 @@ class TursoPDOStatement extends PDOStatement
     {
         collect((array) $params)
             ->each(function (mixed $value, int $key) {
-                $type = match (gettype($value)) {
-                    'boolean' => PDO::PARAM_BOOL,
-                    'double', 'integer' => PDO::PARAM_INT,
-                    'resource' => PDO::PARAM_LOB,
-                    'NULL'     => PDO::PARAM_NULL,
-                    default    => PDO::PARAM_STR,
-                };
+                $type = PdoParam::fromValue($value);
 
-                $this->bindValue($key, $value, $type);
+                $this->bindValue($key, $value, $type->value);
             });
 
         $this->response = Turso::query($this->query, array_values($this->bindings));
@@ -155,8 +124,6 @@ class TursoPDOStatement extends PDOStatement
 
             default => throw new PDOException('Unsupported fetch mode.'),
         };
-
-        // $this->responses = new Collection();
 
         return $response;
     }
