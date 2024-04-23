@@ -2,6 +2,13 @@
 
 All notable changes to `richan-fongdasen/turso-laravel` will be documented in this file.
 
+## 0.6.1 - 2024-04-23
+
+* Added a [quick fix for the binary/blob data](https://github.com/richan-fongdasen/turso-laravel/pull/4) issue.
+* Added tests related to supported database column types.
+* Added tests related to the Eloquent attribute casting feature.
+* Fixed errors found by the added test cases.
+
 ## 0.6.0 - 2024-04-22
 
 Enable database transactions feature.
