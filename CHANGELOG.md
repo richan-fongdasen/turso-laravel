@@ -2,6 +2,10 @@
 
 All notable changes to `richan-fongdasen/turso-laravel` will be documented in this file.
 
+## 0.7.0 - 2024-04-29
+
+Make the previously hardcoded values to be configurable.
+
 ## 0.6.1 - 2024-04-23
 
 * Added a [quick fix for the binary/blob data](https://github.com/richan-fongdasen/turso-laravel/pull/4) issue.
