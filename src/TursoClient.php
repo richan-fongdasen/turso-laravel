@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace RichanFongdasen\Turso;
 
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use RichanFongdasen\Turso\Http\QueryResponse;
@@ -28,7 +29,10 @@ class TursoClient
 
     public function __construct(array $config = [])
     {
-        $this->config = new Collection($config);
+        $this->config = new Collection(array_merge(
+            $config,
+            config('turso-laravel', [])
+        ));
 
         $this->queryLog = new Collection();
 
@@ -65,8 +69,8 @@ class TursoClient
 
         return Http::withHeaders([
             'Content-Type' => 'application/json',
-        ])->connectTimeout(2)
-            ->timeout(5)
+        ])->connectTimeout((int) Arr::get($this->config, 'client.connect_timeout', 2))
+            ->timeout((int) Arr::get($this->config, 'client.timeout', 5))
             ->withToken($accessToken)
             ->acceptJson();
     }
