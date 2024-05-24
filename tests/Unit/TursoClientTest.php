@@ -139,3 +139,48 @@ test('it can replace the base url with the one that suggested by turso response'
 
     expect(Turso::getBaseUrl())->toBe('http://base-url-example.turso.io');
 })->group('TursoClient', 'UnitTest');
+
+test('it can close the existing http connection', function () {
+    fakeHttpRequest([
+        'baton'    => 'baton-string-example',
+        'base_url' => 'http://base-url-example.turso.io',
+        'results'  => [
+            [
+                'type'     => 'ok',
+                'response' => [
+                    'result' => [
+                        'affected_row_count' => 1,
+                        'last_insert_rowid'  => '1',
+                        'replication_index'  => 0,
+                    ],
+                ],
+            ],
+            [
+                'type'     => 'ok',
+                'response' => [
+                    'result' => [
+                        'affected_row_count' => 1,
+                        'last_insert_rowid'  => '1',
+                        'replication_index'  => 0,
+                    ],
+                ],
+            ],
+        ],
+    ]);
+
+    $statement = 'SELECT * FROM "users" WHERE "id" = ?';
+    $bindings = [
+        [
+            'type'  => 'integer',
+            'value' => 1,
+        ],
+    ];
+
+    Turso::query($statement, $bindings);
+
+    expect(Turso::getBaton())->toBe('baton-string-example');
+
+    Turso::close();
+
+    expect(Turso::getBaton())->toBeNull();
+})->group('TursoClient', 'UnitTest');

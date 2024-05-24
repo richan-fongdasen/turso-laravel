@@ -1,5 +1,7 @@
 import { createClient } from "@libsql/client";
 
+const startTime = Date.now();
+
 let databaseURL = process.argv.slice(2)[0];
 const accessToken = process.argv.slice(2)[1];
 const replicaPath = process.argv.slice(2)[2];
@@ -18,4 +20,4 @@ console.log('Syncing database to replica ' + replicaPath + ' from ' + databaseUR
 
 await client.sync();
 
-console.log('Sync completed.');
+console.log('Sync completed in ' + (Date.now() - startTime) + 'ms.');

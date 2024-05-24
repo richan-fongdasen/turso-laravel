@@ -36,13 +36,9 @@ class TursoClient
 
         $this->queryLog = new Collection();
 
-        $this->enableQueryLog();
+        $this->disableQueryLog();
         $this->resetHttpClientState();
-    }
-
-    public function __destruct()
-    {
-        $this->close();
+        $this->httpRequest();
     }
 
     public function close(): void
