@@ -25,7 +25,7 @@ class TursoSchemaBuilder extends SQLiteBuilder
         $statement->execute();
 
         collect($statement->fetchAll(\PDO::FETCH_NUM))->each(function (array $query) {
-            $this->connection->select($query[0]);
+            $this->connection->statement($query[0]);
         });
     }
 
@@ -34,16 +34,16 @@ class TursoSchemaBuilder extends SQLiteBuilder
         $this->dropAllTriggers();
         $this->dropAllIndexes();
 
-        $this->connection->select($this->grammar()->compileDisableForeignKeyConstraints());
+        $this->connection->statement($this->grammar()->compileDisableForeignKeyConstraints());
 
         $statement = $this->connection->getPdo()->prepare($this->grammar()->compileDropAllTables());
         $statement->execute();
 
         collect($statement->fetchAll(\PDO::FETCH_NUM))->each(function (array $query) {
-            $this->connection->select($query[0]);
+            $this->connection->statement($query[0]);
         });
 
-        $this->connection->select($this->grammar()->compileEnableForeignKeyConstraints());
+        $this->connection->statement($this->grammar()->compileEnableForeignKeyConstraints());
     }
 
     protected function dropAllTriggers(): void
@@ -52,7 +52,7 @@ class TursoSchemaBuilder extends SQLiteBuilder
         $statement->execute();
 
         collect($statement->fetchAll(\PDO::FETCH_NUM))->each(function (array $query) {
-            $this->connection->select($query[0]);
+            $this->connection->statement($query[0]);
         });
     }
 
@@ -62,7 +62,7 @@ class TursoSchemaBuilder extends SQLiteBuilder
         $statement->execute();
 
         collect($statement->fetchAll(\PDO::FETCH_NUM))->each(function (array $query) {
-            $this->connection->select($query[0]);
+            $this->connection->statement($query[0]);
         });
     }
 
