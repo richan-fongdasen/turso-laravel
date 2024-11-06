@@ -7,7 +7,9 @@ namespace RichanFongdasen\Turso\Database;
 use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Artisan;
 use PDO;
+use RichanFongdasen\Turso\Jobs\TursoSyncJob;
 
 class TursoConnection extends Connection
 {
@@ -82,5 +84,51 @@ class TursoConnection extends Connection
     protected function isUniqueConstraintError(Exception $exception): bool
     {
         return boolval(preg_match('#(column(s)? .* (is|are) not unique|UNIQUE constraint failed: .*)#i', $exception->getMessage()));
+    }
+
+    public function sync(): void
+    {
+        Artisan::call('turso:sync', ['connectionName' => $this->getName()]);
+    }
+
+    public function backgroundSync(): void
+    {
+        TursoSyncJob::dispatch((string) $this->getName());
+        $this->enableQueryLog();
+    }
+
+    public function disableQueryLog(): void
+    {
+        parent::disableQueryLog();
+
+        $this->tursoPdo()->getClient()->disableQueryLog();
+    }
+
+    public function enableQueryLog(): void
+    {
+        parent::enableQueryLog();
+
+        $this->tursoPdo()->getClient()->enableQueryLog();
+    }
+
+    public function flushQueryLog(): void
+    {
+        parent::flushQueryLog();
+
+        $this->tursoPdo()->getClient()->flushQueryLog();
+    }
+
+    public function getQueryLog()
+    {
+        return $this->tursoPdo()->getClient()->getQueryLog()->toArray();
+    }
+
+    public function tursoPdo(): TursoPDO
+    {
+        if (! $this->pdo instanceof TursoPDO) {
+            throw new Exception('The current PDO instance is not an instance of TursoPDO.');
+        }
+
+        return $this->pdo;
     }
 }

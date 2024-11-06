@@ -3,7 +3,6 @@
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use RichanFongdasen\Turso\Facades\Turso;
 
 beforeEach(function () {
     $this->pdo = new \PDO('sqlite::memory:');
@@ -24,8 +23,6 @@ test('it can retrieve data from read replica', function () {
 
 test('it will use the primary database connection for data manipulation operation', function () {
     fakeHttpRequest();
-
-    Turso::freshHttpRequest();
 
     DB::table('users')->insert([
         'name' => 'June Monroe',

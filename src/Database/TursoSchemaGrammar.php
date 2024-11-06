@@ -30,8 +30,9 @@ class TursoSchemaGrammar extends SQLiteGrammar
     }
 
     #[Override]
-    public function wrap($value, $prefixAlias = false): string
+    public function wrap(mixed $value, mixed $prefixAlias = false): string
     {
+        /** @phpstan-ignore arguments.count */
         return str_replace('"', '\'', parent::wrap($value, $prefixAlias));
     }
 }

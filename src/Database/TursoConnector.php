@@ -18,6 +18,6 @@ class TursoConnector extends Connector implements ConnectorInterface
     {
         $options = $this->getOptions($config);
 
-        return new TursoPDO('sqlite::memory:', null, null, $options);
+        return new TursoPDO($config, $options);
     }
 }

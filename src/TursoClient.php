@@ -36,7 +36,7 @@ class TursoClient
 
         $this->queryLog = new Collection();
 
-        $this->enableQueryLog();
+        $this->disableQueryLog();
         $this->resetHttpClientState();
     }
 
@@ -85,6 +85,11 @@ class TursoClient
         $this->loggingQueries = true;
     }
 
+    public function flushQueryLog(): void
+    {
+        $this->queryLog = new Collection();
+    }
+
     public function freshHttpRequest(): PendingRequest
     {
         $this->httpRequest = $this->createHttpRequest();
@@ -107,12 +112,17 @@ class TursoClient
         return $this->queryLog;
     }
 
+    public function logging(): bool
+    {
+        return $this->loggingQueries;
+    }
+
     public function query(string $statement, array $bindingValues = []): QueryResponse
     {
         $query = new ExecuteQuery($statement, $bindingValues);
 
         $requestBody = RequestBody::create($this->baton)
-            ->withForeignKeyConstraints()
+            ->withForeignKeyConstraints((bool) $this->config->get('foreign_key_constraints'))
             ->push($query);
 
         $httpResponse = $this->httpRequest()

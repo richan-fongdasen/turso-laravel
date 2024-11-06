@@ -7,7 +7,7 @@ beforeEach(function () {
     $this->baton = null;
     $this->request = RequestBody::create($this->baton)
         ->withCloseRequest()
-        ->withForeignKeyConstraints()
+        ->withForeignKeyConstraints(true)
         ->push(new ExecuteQuery('SELECT * FROM "users"'));
 });
 
@@ -110,7 +110,7 @@ test('it can remove the close query from the body', function () {
 test('it can convert itself into an array with baton value being set', function () {
     $this->request = RequestBody::create('some-baton-string')
         ->withCloseRequest()
-        ->withForeignKeyConstraints()
+        ->withForeignKeyConstraints(true)
         ->push(new ExecuteQuery('SELECT * FROM "users"'));
 
     expect($this->request->toArray())->toBe([

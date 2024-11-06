@@ -3,14 +3,18 @@
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use RichanFongdasen\Turso\Exceptions\TursoQueryException;
-use RichanFongdasen\Turso\Facades\Turso;
+use RichanFongdasen\Turso\TursoClient;
+
+beforeEach(function () {
+    $this->client = new TursoClient(config('database.connections.turso'));
+});
 
 test('it can reset client state', function () {
-    Turso::resetHttpClientState();
+    $this->client->resetHttpClientState();
 
-    expect(Turso::getBaseUrl())->toBe('http://127.0.0.1:8080')
-        ->and(Turso::getBaton())->toBeNull();
-})->group('TursoClient', 'UnitTest');
+    expect($this->client->getBaseUrl())->toBe('http://127.0.0.1:8080')
+        ->and($this->client->getBaton())->toBeNull();
+})->group('TursoClientTest', 'UnitTest');
 
 test('it can log queries', function () {
     fakeHttpRequest();
@@ -67,24 +71,46 @@ test('it can log queries', function () {
         ],
     ];
 
-    Turso::enableQueryLog();
-    Turso::freshHttpRequest();
+    $this->client->enableQueryLog();
+    $this->client->freshHttpRequest();
 
-    Turso::query($statement, $bindings);
+    $this->client->query($statement, $bindings);
 
-    expect(Turso::getQueryLog()->count())->toBe(1)
-        ->and(Turso::getQueryLog()->first())->toBe($expectedLog);
-})->group('TursoClient', 'UnitTest');
+    expect($this->client->getQueryLog()->count())->toBe(1)
+        ->and($this->client->getQueryLog()->first())->toBe($expectedLog);
+})->group('TursoClientTest', 'UnitTest');
+
+test('it can flush the query log', function () {
+    fakeHttpRequest();
+
+    $statement = 'SELECT * FROM "users" WHERE "id" = ?';
+    $bindings = [
+        [
+            'type'  => 'integer',
+            'value' => 1,
+        ],
+    ];
+
+    $this->client->enableQueryLog();
+    $this->client->freshHttpRequest();
+
+    $this->client->query($statement, $bindings);
+
+    $this->client->flushQueryLog();
+
+    expect($this->client->getQueryLog()->count())->toBe(0)
+        ->and($this->client->getQueryLog()->first())->toBeNull();
+})->group('TursoClientTest', 'UnitTest');
 
 test('it raises exception on any HTTP errors', function () {
     Http::fake([
         '*' => Http::response(['message' => 'Internal Server Error'], 500),
     ]);
 
-    Turso::freshHttpRequest();
+    $this->client->freshHttpRequest();
 
-    Turso::query('SELECT * FROM "users"');
-})->throws(RequestException::class)->group('TursoClient', 'UnitTest');
+    $this->client->query('SELECT * FROM "users"');
+})->throws(RequestException::class)->group('TursoClientTest', 'UnitTest');
 
 test('it raises TursoQueryException when the query response has any error in it', function () {
     Http::fake([
@@ -104,8 +130,8 @@ test('it raises TursoQueryException when the query response has any error in it'
         ),
     ]);
 
-    Turso::query('SELECT * FROM "users"');
-})->throws(TursoQueryException::class)->group('TursoClient', 'UnitTest');
+    $this->client->query('SELECT * FROM "users"');
+})->throws(TursoQueryException::class)->group('TursoClientTest', 'UnitTest');
 
 test('it can replace the base url with the one that suggested by turso response', function () {
     fakeHttpRequest([
@@ -134,8 +160,8 @@ test('it can replace the base url with the one that suggested by turso response'
         ],
     ]);
 
-    Turso::freshHttpRequest();
-    Turso::query('SELECT * FROM "users"');
+    $this->client->freshHttpRequest();
+    $this->client->query('SELECT * FROM "users"');
 
-    expect(Turso::getBaseUrl())->toBe('http://base-url-example.turso.io');
-})->group('TursoClient', 'UnitTest');
+    expect($this->client->getBaseUrl())->toBe('http://base-url-example.turso.io');
+})->group('TursoClientTest', 'UnitTest');

@@ -4,6 +4,24 @@ use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Process;
 
+test('it will fail if the specified connection is not a Turso connection', function () {
+    Process::fake();
+
+    $result = Artisan::call('turso:sync', ['connectionName' => 'mysql']);
+
+    expect($result)->toBe(1);
+    expect(Artisan::output())->toContain('The specified connection is not a Turso connection.');
+})->group('TursoSyncCommandTest', 'UnitTest');
+
+test('it will fail if the specified connection does not have a read replica', function () {
+    Process::fake();
+
+    $result = Artisan::call('turso:sync', ['connectionName' => 'turso']);
+
+    expect($result)->toBe(1);
+    expect(Artisan::output())->toContain('The specified connection does not have a read replica.');
+})->group('TursoSyncCommandTest', 'UnitTest');
+
 test('it can run the cli script to sync the database', function () {
     Process::fake();
 

@@ -8,7 +8,6 @@ use Illuminate\Console\Events\CommandFinished;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use RichanFongdasen\Turso\Commands\TursoSyncCommand;
 use RichanFongdasen\Turso\Database\TursoConnection;
@@ -23,13 +22,6 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
     {
         parent::boot();
 
-        if (
-            (config('database.default') !== 'turso') ||
-            ((string) config('database.connections.turso.db_replica') === '')
-        ) {
-            return;
-        }
-
         Event::listen(function (CommandStarting $event) {
             if (! app()->bound('running-artisan-command')) {
                 app()->instance('running-artisan-command', data_get($event, 'command'));
@@ -42,7 +34,6 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
             }
 
             if (
-                DB::hasModifiedRecords() &&
                 (app('running-artisan-command') === data_get($event, 'command'))
             ) {
                 Turso::sync();
@@ -72,7 +63,7 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
         parent::register();
 
         $this->app->scoped(TursoManager::class, function () {
-            return new TursoManager(config('database.connections.turso', []));
+            return new TursoManager();
         });
 
         $this->app->extend(DatabaseManager::class, function (DatabaseManager $manager) {
@@ -81,8 +72,6 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
                 $pdo = $connector->connect($config);
 
                 $connection = new TursoConnection($pdo, $database ?? 'turso', $prefix, $config);
-                app()->instance(TursoConnection::class, $connection);
-
                 $connection->createReadPdo($config);
 
                 return $connection;

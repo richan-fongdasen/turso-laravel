@@ -16,7 +16,7 @@ You can find a demo application that uses this Turso database driver in the [ric
 
 -   PHP 8.2 or higher
 -   Laravel 11.0 or higher
--   Node.js 16 or higher
+-   Node.js 18 or higher
 
 ## Installation
 
@@ -131,7 +131,7 @@ The driver supports the embedded replica feature. If you're unfamiliar with this
 Run the sync script manually using the following Artisan command:
 
 ```bash
-php artisan turso:sync
+php artisan turso:sync <connectionName?>
 ```
 
 > You may encounter an error if the path to the replica database does not exist. This is expected when the replica database has not been created yet.
@@ -146,11 +146,19 @@ use RichanFongdasen\Turso\Facades\Turso;
 
 if ( DB::hasModifiedRecords() ) {
     // Run the sync script immediately
-    Turso::sync();
+    DB::sync();
 
     // Run the sync script in the background
-    Turso::backgroundSync();
+    DB::backgroundSync();
 }
+
+// Sync on the specific connection
+DB::connection('turso')->sync();
+DB::connection('turso')->backgroundSync();
+
+// Sync on all of the turso database connections
+Turso::sync();
+Turso::backgroundSync();
 ```
 
 ## Debugging
@@ -158,12 +166,20 @@ if ( DB::hasModifiedRecords() ) {
 To debug the HTTP requests and responses sent and received by the Turso database client, enable the debugging feature as follows:
 
 ```php
-Turso::enableQueryLog();
+// Enabling query log on default database connection
+DB::enableQueryLog();
 
+// Enabling query log on specific connection
+DB::connection('turso')->enableQueryLog();
+
+// Perform some queries
 DB::table('users')->get();
 
-// Get the query log
-$logs = Turso::getQueryLog();
+// Get the query log for default database connection
+DB::getQueryLog();
+
+// Get the query log for specific connection
+DB::connection('turso')->getQueryLog();
 ```
 
 ## Changelog

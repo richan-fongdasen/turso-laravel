@@ -3,4 +3,3 @@ parameters:
     ignoreErrors:
         - identifier: missingType.iterableValue
         - identifier: missingType.generics
-        - '#Variable method call on RichanFongdasen\\Turso\\TursoClient.#'

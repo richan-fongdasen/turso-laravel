@@ -2,21 +2,10 @@
 
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Process;
 use RichanFongdasen\Turso\Facades\Turso;
 use RichanFongdasen\Turso\Jobs\TursoSyncJob;
-
-test('it raises exception on calling an undefined method', function () {
-    Turso::undefinedMethod();
-})->throws(\BadMethodCallException::class)->group('TursoManagerTest', 'UnitTest');
-
-test('it raises exception on calling the sync() method without configuring the read replica', function () {
-    Turso::sync();
-})->throws(\LogicException::class)->group('TursoManagerTest', 'UnitTest');
-
-test('it raises exception on calling the backgroundSync() method without configuring the read replica', function () {
-    Turso::backgroundSync();
-})->throws(\LogicException::class)->group('TursoManagerTest', 'UnitTest');
 
 test('it can trigger the sync command immediately', function () {
     Process::fake();
@@ -25,6 +14,8 @@ test('it can trigger the sync command immediately', function () {
         'database.connections.turso.db_replica' => '/tmp/turso.sqlite',
         'turso-laravel.sync_command.node_path'  => '/dev/null',
     ]);
+
+    DB::connection('turso')->setRecordModificationState(true);
 
     Turso::sync();
 
@@ -44,6 +35,8 @@ test('it can dispatch the sync background job', function () {
 
     config(['database.connections.turso.db_replica' => '/tmp/turso.sqlite']);
 
+    DB::connection('turso')->setRecordModificationState(true);
+
     Turso::backgroundSync();
 
     Bus::assertDispatched(TursoSyncJob::class);
@@ -56,6 +49,8 @@ test('it can run the sync background job and call the sync artisan command', fun
         'database.connections.turso.db_replica' => '/tmp/turso.sqlite',
         'turso-laravel.sync_command.node_path'  => '/dev/null',
     ]);
+
+    DB::connection('turso')->setRecordModificationState(true);
 
     Turso::backgroundSync();
 

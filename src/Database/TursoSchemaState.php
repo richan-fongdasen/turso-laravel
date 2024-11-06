@@ -6,6 +6,4 @@ namespace RichanFongdasen\Turso\Database;
 
 use Illuminate\Database\Schema\SqliteSchemaState;
 
-class TursoSchemaState extends SqliteSchemaState
-{
-}
+class TursoSchemaState extends SqliteSchemaState {}

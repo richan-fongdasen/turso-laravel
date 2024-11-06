@@ -6,6 +6,4 @@ namespace RichanFongdasen\Turso\Database;
 
 use Illuminate\Database\Query\Processors\SQLiteProcessor;
 
-class TursoQueryProcessor extends SQLiteProcessor
-{
-}
+class TursoQueryProcessor extends SQLiteProcessor {}

@@ -1,29 +1,97 @@
 <?php
 
+use Illuminate\Process\PendingProcess;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Process;
 use RichanFongdasen\Turso\Database\TursoPDO;
-
-beforeEach(function () {
-    $this->connection = DB::connection('turso');
-});
+use RichanFongdasen\Turso\Jobs\TursoSyncJob;
 
 test('it can create a PDO object for read replica database connection', function () {
-    expect($this->connection->getReadPdo())->toBeInstanceOf(TursoPDO::class);
+    expect(DB::connection('turso')->getReadPdo())->toBeInstanceOf(TursoPDO::class);
 
-    $pdo = $this->connection->createReadPdo([
+    $pdo = DB::connection('turso')->createReadPdo([
         'db_replica' => '/dev/null',
     ]);
 
     expect($pdo)->toBeInstanceOf(\PDO::class)
-        ->and($this->connection->getReadPdo())->toBe($pdo);
+        ->and(DB::connection('turso')->getReadPdo())->toBe($pdo);
 })->group('TursoConnectionTest', 'UnitTest');
 
 test('it will return null when trying to create read PDO with no replica database path configured', function () {
-    expect($this->connection->createReadPdo())->toBeNull();
+    expect(DB::connection('turso')->createReadPdo())->toBeNull();
 })->group('TursoConnectionTest', 'UnitTest');
 
 test('it can escape binary data and convert it into string type', function () {
-    $actual = $this->connection->escape('Hello world!', true);
+    $actual = DB::connection('turso')->escape('Hello world!', true);
 
     expect($actual)->toBe("x'48656c6c6f20776f726c6421'");
+})->group('TursoConnectionTest', 'UnitTest');
+
+test('it can trigger the sync command to synchronize the database', function () {
+    Process::fake();
+
+    config([
+        'database.connections.turso.db_replica' => '/tmp/turso.sqlite',
+        'turso-laravel.sync_command.node_path'  => '/dev/null',
+    ]);
+
+    DB::connection('turso')->sync();
+
+    Process::assertRan(function (PendingProcess $process) {
+        $expectedPath = realpath(__DIR__ . '/../../..');
+
+        expect($process->command)->toBe('/dev/null turso-sync.mjs "http://127.0.0.1:8080" "your-access-token" "/tmp/turso.sqlite"')
+            ->and($process->timeout)->toBe(60)
+            ->and($process->path)->toBe($expectedPath);
+
+        return true;
+    });
+})->group('TursoConnectionTest', 'UnitTest');
+
+test('it can dispatch the sync job to synchronize the database', function () {
+    Bus::fake();
+
+    config([
+        'database.connections.turso.db_replica' => '/tmp/turso.sqlite',
+        'turso-laravel.sync_command.node_path'  => '/dev/null',
+    ]);
+
+    DB::connection('turso')->backgroundSync();
+
+    Bus::assertDispatched(TursoSyncJob::class);
+})->group('TursoConnectionTest', 'UnitTest');
+
+test('it can enable query logging feature', function () {
+    DB::connection('turso')->enableQueryLog();
+
+    expect(DB::connection('turso')->logging())->toBeTrue()
+        ->and(DB::connection('turso')->tursoPdo()->getClient()->logging())->toBeTrue();
+})->group('TursoConnectionTest', 'UnitTest');
+
+test('it can disable query logging feature', function () {
+    DB::connection('turso')->disableQueryLog();
+
+    expect(DB::connection('turso')->logging())->toBeFalse()
+        ->and(DB::connection('turso')->tursoPdo()->getClient()->logging())->toBeFalse();
+})->group('TursoConnectionTest', 'UnitTest');
+
+test('it can get the query log', function () {
+    DB::connection('turso')->enableQueryLog();
+
+    $log = DB::connection('turso')->getQueryLog();
+
+    expect($log)->toBeArray()
+        ->and($log)->toHaveCount(0);
+})->group('TursoConnectionTest', 'UnitTest');
+
+test('it can flush the query log', function () {
+    DB::connection('turso')->enableQueryLog();
+
+    DB::connection('turso')->flushQueryLog();
+
+    $log = DB::connection('turso')->getQueryLog();
+
+    expect($log)->toBeArray()
+        ->and($log)->toHaveCount(0);
 })->group('TursoConnectionTest', 'UnitTest');

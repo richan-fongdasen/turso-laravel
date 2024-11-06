@@ -6,6 +6,4 @@ namespace RichanFongdasen\Turso\Database;
 
 use Illuminate\Database\Query\Grammars\SQLiteGrammar;
 
-class TursoQueryGrammar extends SQLiteGrammar
-{
-}
+class TursoQueryGrammar extends SQLiteGrammar {}

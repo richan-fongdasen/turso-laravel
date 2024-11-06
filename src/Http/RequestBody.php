@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace RichanFongdasen\Turso\Http;
 
-use ErrorException;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use RichanFongdasen\Turso\Contracts\TursoQuery;
-use RichanFongdasen\Turso\Database\TursoConnection;
 use RichanFongdasen\Turso\Database\TursoSchemaGrammar;
 use RichanFongdasen\Turso\Queries\CloseQuery;
 use RichanFongdasen\Turso\Queries\ExecuteQuery;
@@ -72,7 +70,7 @@ class RequestBody implements Arrayable
         return $this;
     }
 
-    public function withForeignKeyConstraints(): self
+    public function withForeignKeyConstraints(bool $constraintsEnabled): self
     {
         // Make sure that the foreign key constraints statement
         // is getting executed only once.
@@ -80,13 +78,9 @@ class RequestBody implements Arrayable
             return $this;
         }
 
-        $grammar = app(TursoConnection::class)->getSchemaGrammar();
+        $grammar = app(TursoSchemaGrammar::class);
 
-        if (! ($grammar instanceof TursoSchemaGrammar)) {
-            throw new ErrorException('The registered schema grammar is not an instance of TursoSchemaGrammar.');
-        }
-
-        $statement = (bool) config('database.connections.turso.foreign_key_constraints')
+        $statement = $constraintsEnabled
             ? $grammar->compileEnableForeignKeyConstraints()
             : $grammar->compileDisableForeignKeyConstraints();
 

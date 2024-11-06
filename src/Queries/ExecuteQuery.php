@@ -11,8 +11,7 @@ class ExecuteQuery extends Query
     public function __construct(
         protected string $statement,
         protected array $bindings = []
-    ) {
-    }
+    ) {}
 
     public function getBindings(): array
     {

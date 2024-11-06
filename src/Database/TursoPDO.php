@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace RichanFongdasen\Turso\Database;
 
 use PDO;
+use RichanFongdasen\Turso\TursoClient;
 
 /**
  * Turso PDO Database Connection.
@@ -19,17 +20,22 @@ use PDO;
  */
 class TursoPDO extends PDO
 {
+    protected TursoClient $client;
+
+    protected array $config = [];
+
     protected bool $inTransaction = false;
 
     protected array $lastInsertIds = [];
 
     public function __construct(
-        string $dsn = 'sqlite::memory:',
-        ?string $username = null,
-        ?string $password = null,
+        array $config,
         ?array $options = null
     ) {
-        parent::__construct($dsn, $username, $password, $options);
+        parent::__construct('sqlite::memory:', null, null, $options);
+
+        $this->config = $config;
+        $this->client = new TursoClient($config);
     }
 
     public function beginTransaction(): bool
@@ -54,6 +60,11 @@ class TursoPDO extends PDO
         $statement->execute();
 
         return $statement->rowCount();
+    }
+
+    public function getClient(): TursoClient
+    {
+        return $this->client;
     }
 
     public function inTransaction(): bool

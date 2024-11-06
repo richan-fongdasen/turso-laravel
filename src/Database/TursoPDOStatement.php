@@ -10,7 +10,6 @@ use PDOException;
 use PDOStatement;
 use RichanFongdasen\Turso\Enums\PdoParam;
 use RichanFongdasen\Turso\Enums\TursoType;
-use RichanFongdasen\Turso\Facades\Turso;
 use RichanFongdasen\Turso\Http\QueryResponse;
 
 /**
@@ -33,8 +32,7 @@ class TursoPDOStatement extends PDOStatement
         protected TursoPDO $pdo,
         protected string $query,
         protected array $options = [],
-    ) {
-    }
+    ) {}
 
     public function setFetchMode(int $mode, mixed ...$args): bool
     {
@@ -61,7 +59,7 @@ class TursoPDOStatement extends PDOStatement
                 $this->bindValue($key, $value, $type->value);
             });
 
-        $this->response = Turso::query($this->query, array_values($this->bindings));
+        $this->response = $this->pdo->getClient()->query($this->query, array_values($this->bindings));
 
         $lastId = (int) $this->response->getLastInsertId();
         if ($lastId > 0) {
