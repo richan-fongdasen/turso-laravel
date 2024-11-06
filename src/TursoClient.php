@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace RichanFongdasen\Turso;
 
+use Illuminate\Cache\ArrayStore;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -17,9 +18,9 @@ class TursoClient
 {
     protected string $baseUrl;
 
-    protected ?string $baton = null;
-
     protected Collection $config;
+
+    protected ArrayStore $connectionStore;
 
     protected bool $loggingQueries;
 
@@ -33,6 +34,9 @@ class TursoClient
             $config,
             config('turso-laravel', [])
         ));
+        $this->baseUrl = (string) $this->config->get('db_url', '');
+
+        $this->connectionStore = new ArrayStore();
 
         $this->queryLog = new Collection();
 
@@ -47,15 +51,15 @@ class TursoClient
 
     public function close(): void
     {
-        if ((string) $this->baton === '') {
+        if ((string) $this->getBaton() === '') {
             return;
         }
 
-        $body = RequestBody::create($this->baton)
+        $body = RequestBody::create($this->getBaton())
             ->withCloseRequest();
 
         $this->httpRequest()
-            ->baseUrl($this->baseUrl)
+            ->baseUrl($this->getBaseUrl())
             ->post('/v3/pipeline', $body->toArray());
 
         $this->resetHttpClientState();
@@ -97,14 +101,14 @@ class TursoClient
         return $this->httpRequest;
     }
 
-    public function getBaseUrl(): ?string
+    public function getBaseUrl(): string
     {
-        return $this->baseUrl;
+        return $this->connectionStore->get('baseUrl') ?? $this->baseUrl;
     }
 
     public function getBaton(): ?string
     {
-        return $this->baton;
+        return $this->connectionStore->get('baton');
     }
 
     public function getQueryLog(): Collection
@@ -121,12 +125,12 @@ class TursoClient
     {
         $query = new ExecuteQuery($statement, $bindingValues);
 
-        $requestBody = RequestBody::create($this->baton)
+        $requestBody = RequestBody::create($this->getBaton())
             ->withForeignKeyConstraints((bool) $this->config->get('foreign_key_constraints'))
             ->push($query);
 
         $httpResponse = $this->httpRequest()
-            ->baseUrl($this->baseUrl)
+            ->baseUrl($this->getBaseUrl())
             ->post('/v3/pipeline', $requestBody->toArray());
 
         if ($httpResponse->failed()) {
@@ -143,12 +147,8 @@ class TursoClient
             ]);
         }
 
-        $this->baton = $responseBody->getBaton();
-        $baseUrl = (string) $responseBody->getBaseUrl();
-
-        if ($baseUrl !== '') {
-            $this->baseUrl = $baseUrl;
-        }
+        $this->connectionStore->put('baton', $responseBody->getBaton(), 9);
+        $this->connectionStore->put('baseUrl', $responseBody->getBaseUrl(), 9);
 
         return $responseBody->getQueryResponse($query->getIndex());
     }
@@ -162,7 +162,7 @@ class TursoClient
 
     public function resetHttpClientState(): void
     {
-        $this->baton = null;
-        $this->baseUrl = (string) $this->config->get('db_url', '');
+        $this->connectionStore->forget('baton');
+        $this->connectionStore->forget('baseUrl');
     }
 }
