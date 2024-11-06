@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Turso Local Database
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
