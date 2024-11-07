@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Database\Connection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Str;
 use PDO;
 use RichanFongdasen\Turso\Jobs\TursoSyncJob;
 
@@ -15,6 +16,10 @@ class TursoConnection extends Connection
 {
     public function __construct(TursoPDO $pdo, string $database = ':memory:', string $tablePrefix = '', array $config = [])
     {
+        if (isset($config['db_url']) && Str::startsWith($config['db_url'], 'libsql:')) {
+            $config['db_url'] = Str::replaceFirst('libsql:', 'https:', $config['db_url']);
+        }
+
         parent::__construct($pdo, $database, $tablePrefix, $config);
 
         $this->schemaGrammar = $this->getDefaultSchemaGrammar();

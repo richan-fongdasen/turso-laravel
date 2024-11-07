@@ -95,3 +95,11 @@ test('it can flush the query log', function () {
     expect($log)->toBeArray()
         ->and($log)->toHaveCount(0);
 })->group('TursoConnectionTest', 'UnitTest');
+
+test('it will replace the libsql protocol in database url to be https protocol', function () {
+    config([
+        'database.connections.turso.db_url' => 'libsql://project-name.turso.io',
+    ]);
+
+    expect(DB::connection('turso')->getConfig('db_url'))->toBe('https://project-name.turso.io');
+})->group('TursoConnectionTest', 'UnitTest');
