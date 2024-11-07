@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace RichanFongdasen\Turso;
 
-use Illuminate\Console\Events\CommandFinished;
-use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
-use Illuminate\Support\Facades\Event;
 use RichanFongdasen\Turso\Commands\TursoSyncCommand;
 use RichanFongdasen\Turso\Database\TursoConnection;
 use RichanFongdasen\Turso\Database\TursoConnector;
@@ -22,22 +19,8 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
     {
         parent::boot();
 
-        Event::listen(function (CommandStarting $event) {
-            if (! app()->bound('running-artisan-command')) {
-                app()->instance('running-artisan-command', data_get($event, 'command'));
-            }
-        });
-
-        Event::listen(function (CommandFinished $event) {
-            if (data_get($event, 'command') === 'turso:sync') {
-                return;
-            }
-
-            if (
-                (app('running-artisan-command') === data_get($event, 'command'))
-            ) {
-                Turso::sync();
-            }
+        app()->terminating(function () {
+            Turso::sync();
         });
     }
 

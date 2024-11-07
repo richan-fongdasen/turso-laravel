@@ -15,15 +15,15 @@ class TursoSyncCommand extends Command
 
     public $description = 'Sync changes from the remote database to the local replica manually.';
 
-    protected function compileRunProcess(array $config): string
+    protected function compileRunProcess(string $connectionName): string
     {
         return sprintf(
             '%s %s "%s" "%s" "%s"',
             $this->getNodePath(),
             config('turso-laravel.sync_command.script_filename'),
-            data_get($config, 'db_url'),
-            data_get($config, 'access_token'),
-            data_get($config, 'db_replica'),
+            DB::connection($connectionName)->getConfig('db_url'),
+            DB::connection($connectionName)->getConfig('access_token'),
+            DB::connection($connectionName)->getConfig('db_replica'),
         );
     }
 
@@ -42,7 +42,7 @@ class TursoSyncCommand extends Command
     {
         $timeout = (int) config('turso-laravel.sync_command.timeout');
 
-        $connectionName = (string) $this->argument('connectionName');
+        $connectionName = $this->argument('connectionName') ?? DB::getDefaultConnection();
 
         if (DB::connection($connectionName)->getConfig('driver') !== 'turso') {
             $this->error('The specified connection is not a Turso connection.');
@@ -58,9 +58,7 @@ class TursoSyncCommand extends Command
 
         $result = Process::timeout($timeout)
             ->path(config('turso-laravel.sync_command.script_path') ?? base_path())
-            ->run($this->compileRunProcess(
-                DB::connection($connectionName)->getConfig()
-            ));
+            ->run($this->compileRunProcess($connectionName));
 
         if ($result->failed()) {
             throw new RuntimeException('Turso sync command failed: ' . $result->errorOutput());
