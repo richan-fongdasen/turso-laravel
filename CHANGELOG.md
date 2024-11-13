@@ -2,6 +2,21 @@
 
 All notable changes to `richan-fongdasen/turso-laravel` will be documented in this file.
 
+## 1.0.0 - 2024-11-13
+
+### What's Changed
+
+* Bump dependabot/fetch-metadata from 2.1.0 to 2.2.0 by @dependabot in https://github.com/richan-fongdasen/turso-laravel/pull/9
+* Added support for multiple Turso database connections in https://github.com/richan-fongdasen/turso-laravel/commit/3b446e39ea247760347c1d6324c7c58e0aedc207
+* Updated Github actions workflow to use docker compose v2 in https://github.com/richan-fongdasen/turso-laravel/commit/fd8aad61eb484a4d52846564c4d8d40e0d7f906b
+* Fixed the artisan command migrate:fresh error in https://github.com/richan-fongdasen/turso-laravel/commit/c7067356a618534eef80fdc3a74374c3b22aeb64
+* Limited the baton token lifetime to 8 seconds in https://github.com/richan-fongdasen/turso-laravel/commit/1e089c909883ae529e871d7b2988f093405cc893
+* Fixed embedded replica sync issue in https://github.com/richan-fongdasen/turso-laravel/commit/a5c16232cc8a37ce5799953446a881a0aa9412a6
+* Changed libsql:// protocol to https:// protocol in database URLs automatically in https://github.com/richan-fongdasen/turso-laravel/commit/0ce0a8bd1116f316d2fd1f11cc0f496320bc67e4
+* Removed unused `database` value from Turso database configuration in https://github.com/richan-fongdasen/turso-laravel/commit/1380f947c667a0a355b7769a6736197aa6a3851a
+
+**Full Changelog**: https://github.com/richan-fongdasen/turso-laravel/compare/0.7.0...1.0.0
+
 ## 0.7.0 - 2024-04-29
 
 Make the previously hardcoded values to be configurable.
