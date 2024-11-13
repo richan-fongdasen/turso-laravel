@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace RichanFongdasen\Turso;
 
-use Illuminate\Database\Connection;
-use Illuminate\Database\DatabaseManager;
+use Illuminate\Support\Facades\DB;
 use RichanFongdasen\Turso\Commands\TursoSyncCommand;
 use RichanFongdasen\Turso\Database\TursoConnection;
 use RichanFongdasen\Turso\Database\TursoConnector;
@@ -49,18 +48,17 @@ class TursoLaravelServiceProvider extends PackageServiceProvider
             return new TursoManager();
         });
 
-        $this->app->extend(DatabaseManager::class, function (DatabaseManager $manager) {
-            Connection::resolverFor('turso', function ($connection = null, ?string $database = null, string $prefix = '', array $config = []) {
-                $connector = new TursoConnector();
-                $pdo = $connector->connect($config);
+        DB::extend('turso', function (array $config, string $name) {
+            $config['database'] = null;
+            $config['name'] = $name;
 
-                $connection = new TursoConnection($pdo, $database ?? 'turso', $prefix, $config);
-                $connection->createReadPdo($config);
+            $connector = new TursoConnector();
+            $pdo = $connector->connect($config);
 
-                return $connection;
-            });
+            $connection = new TursoConnection($pdo, $config['name'], $config['prefix'], $config);
+            $connection->createReadPdo($config);
 
-            return $manager;
+            return $connection;
         });
     }
 }

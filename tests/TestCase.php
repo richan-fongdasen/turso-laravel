@@ -30,7 +30,6 @@ class TestCase extends Orchestra
             'driver'                  => 'turso',
             'db_url'                  => env('DB_URL', 'http://127.0.0.1:8080'),
             'db_replica'              => env('DB_REPLICA'),
-            'database'                => null,
             'prefix'                  => env('DB_PREFIX', ''),
             'access_token'            => 'your-access-token',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
