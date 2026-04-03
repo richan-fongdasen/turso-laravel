@@ -6,6 +6,7 @@ namespace RichanFongdasen\Turso\Database;
 
 use Exception;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Grammar;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
@@ -54,20 +55,25 @@ class TursoConnection extends Connection
 
     protected function getDefaultQueryGrammar(): TursoQueryGrammar
     {
-        $grammar = new TursoQueryGrammar();
-        $grammar->setConnection($this);
-
-        $this->withTablePrefix($grammar);
-
-        return $grammar;
+        return $this->newGrammar(TursoQueryGrammar::class);
     }
 
     protected function getDefaultSchemaGrammar(): TursoSchemaGrammar
     {
-        $grammar = new TursoSchemaGrammar();
-        $grammar->setConnection($this);
+        return $this->newGrammar(TursoSchemaGrammar::class);
+    }
 
-        $this->withTablePrefix($grammar);
+    private function newGrammar(string $class): mixed
+    {
+        // Laravel 12+ removed setConnection() from Grammar and requires
+        // a Connection argument in the constructor instead.
+        if (! method_exists(Grammar::class, 'setConnection')) {
+            return new $class($this);
+        }
+
+        $grammar = new $class();
+        $grammar->setConnection($this);
+        $grammar->setTablePrefix($this->getTablePrefix());
 
         return $grammar;
     }

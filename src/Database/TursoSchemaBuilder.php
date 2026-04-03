@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace RichanFongdasen\Turso\Database;
 
+use Illuminate\Database\Grammar;
 use Illuminate\Database\Schema\SQLiteBuilder;
 use RichanFongdasen\Turso\Exceptions\FeatureNotSupportedException;
 
@@ -69,7 +70,11 @@ class TursoSchemaBuilder extends SQLiteBuilder
     protected function grammar(): TursoSchemaGrammar
     {
         if (! ($this->grammar instanceof TursoSchemaGrammar)) {
-            $this->grammar = new TursoSchemaGrammar();
+            if (! method_exists(Grammar::class, 'setConnection')) {
+                $this->grammar = new TursoSchemaGrammar($this->connection);
+            } else {
+                $this->grammar = new TursoSchemaGrammar();
+            }
         }
 
         return $this->grammar;
